@@ -31,6 +31,22 @@ def determine_category(description):
             return '80/20%'
     return None
 
+def csv_path_of_invoice(directory, invoice_number):
+    print(f"Searching for CSV file for invoice number {invoice_number} in {directory}...")
+    for root, _, files in os.walk(directory):
+        for file in files:
+            print(file)
+            if file.endswith('.csv') and str(invoice_number) in file:
+                file_path = os.path.join(root, file)
+                return file_path
+    raise FileNotFoundError(f"No CSV file found for invoice number {invoice_number}.")
+def extract_text_after_number(text):
+    pattern = re.compile(r'\d{5,}\s+(.*)')
+    match = pattern.search(text)
+    if match:
+        return match.group(1)
+    else:
+        return None
 # Function to find HS code
 def find_hs_code(description):
     description = description.lower()
@@ -107,6 +123,43 @@ def extract_files():
     else:
         print("Error: Could not find all required files.")
         return None, None, None
+
+def extract_files_club():
+    current_dir = os.getcwd()
+    uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi'))
+    
+    pl_pdf_path = None
+    fty_pdf_path = None
+    csv_path = None
+
+    for filename in os.listdir(uploads_dir):
+        if filename.endswith('.pdf') or filename.endswith('.csv'):
+            old_filepath = os.path.join(uploads_dir, filename)
+            new_filename = filename.replace('-', '')
+            new_filepath = os.path.join(uploads_dir, new_filename)
+            
+            # Rename file to remove dashes
+            shutil.move(old_filepath, new_filepath)
+            
+            # Assign the renamed file to the appropriate variable
+            if 'fty' in new_filename.lower() and new_filename.endswith('.pdf'):
+                fty_pdf_path = new_filepath
+            elif 'pl' in new_filename.lower() and new_filename.endswith('.pdf'):
+                pl_pdf_path = new_filepath
+            elif new_filename.endswith('.csv'):
+                csv_path = os.path.dirname(os.path.abspath(new_filepath))
+
+    # Check if the required files were found and assigned
+    if pl_pdf_path and fty_pdf_path and csv_path:
+        print(f"PL PDF Path: {pl_pdf_path}")
+        print(f"FTY PDF Path: {fty_pdf_path}")
+        print(f"CSV Path: {csv_path}")
+        # Return the paths for further use
+        return pl_pdf_path, fty_pdf_path, csv_path
+    else:
+        print("Error: Could not find all required files.")
+        return None, None, None
+
 def wait_for_page_load(driver, timeout=100):
     # Wait for the updateProgress element's display style to be 'none'
     time.sleep(1)
