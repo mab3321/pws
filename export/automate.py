@@ -215,10 +215,6 @@ def fill_form(driver : webdriver.Chrome,transaction_id,data={}):
         # Click the Save button
         click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnSaveBottom")
 
-        # Select the Port of Discharge
-        # select_port(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlPortOfDischarge",option_text = "41846")
-        # Click the Save button
-        click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnSaveBottom")
         print(f"GD Filling Success")
     except Exception as e:
         error = f"For transaction_id { transaction_id } Error Occured => {str(e)}"
@@ -300,8 +296,8 @@ def add_item(driver : webdriver.Chrome,transaction_id,data={}):
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_BasicInfoUc1_pnlTitle"))
     )
     print("HScode Added")
-
-def process_gd_number_pop_up(driver : webdriver.Chrome,data):
+    return data.get('hs_code')
+def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
             # Store the ID of the original window
     original_window = driver.current_window_handle
 
@@ -342,7 +338,49 @@ def process_gd_number_pop_up(driver : webdriver.Chrome,data):
     if data.get('Now Consume') < Quantity:
         write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('Now Consume'),pop_up=True)
 
-def process_analysis_number_pop_up(driver : webdriver.Chrome,analysis_number):
+def process_gd_number_pop_up_957(driver : webdriver.Chrome,data):
+            # Store the ID of the original window
+    original_window = driver.current_window_handle
+
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnGDLookup")
+
+    # Wait for the new window or tab (assume we know a new window opens here)
+    WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
+
+    # Get the list of all window handles
+    windows = driver.window_handles
+
+    # Switch to the new window
+    for window in windows:
+        if window != original_window:
+            driver.switch_to.window(window)
+            break
+
+    # Now you can interact with the new window
+    # For example, finding an element and interacting with it
+    write_text(driver, "txtSearch",data.get('B/E No/PACKAGE NO/PURCHASE INV#'),pop_up=True)
+    click_button(driver, "btnSearch",pop_up=True)
+    time.sleep(5)
+    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+        # Attempt to close the new window
+    try:
+        driver.close()
+    except NoSuchWindowException:
+        print("The new window was already closed.")
+
+    # Switch back to the original window
+    driver.switch_to.window(original_window)
+    iframe = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+        )
+    driver.switch_to.frame(iframe)
+    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems_ctl02_lblSelect' and text()='Select']",by=By.XPATH)
+    Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
+    if data.get('NOW CONSUMED') < Quantity:
+        write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('NOW CONSUMED'),pop_up=True)
+    hs_code = extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtHsCode")
+    return hs_code
+def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code):
             # Store the ID of the original window
     original_window = driver.current_window_handle
 
@@ -363,6 +401,7 @@ def process_analysis_number_pop_up(driver : webdriver.Chrome,analysis_number):
     # Now you can interact with the new window
     # For example, finding an element and interacting with it
     write_text(driver, "txtSearch",analysis_number,pop_up=True)
+    write_text(driver, "txtInputHSCode",hs_code,pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(3)
     click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
@@ -382,7 +421,7 @@ def process_analysis_number_pop_up(driver : webdriver.Chrome,analysis_number):
 def add_excel_data_492(driver : webdriver.Chrome,data):
     
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
-    process_gd_number_pop_up(driver,data)
+    process_gd_number_pop_up_492(driver,data)
 
     click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
 
@@ -390,14 +429,36 @@ def add_excel_data_492(driver : webdriver.Chrome,data):
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
     )
     print(f"Element in pop up Added.")
-def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor):
+
+def add_excel_data_957(driver : webdriver.Chrome,data,analysis_number):
+    
+    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
+    hs_code = process_gd_number_pop_up_957(driver,data)
+    process_analysis_number_pop_up_957(driver,analysis_number=analysis_number,hs_code=hs_code)
+    click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
+
+    WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+    )
+    print(f"Element in pop up Added.")
+
+def process_492(driver,data):
+    for idx,obj in enumerate(data):
+        if obj.get('B/E No'):
+            add_excel_data_492(driver,data=obj)
+def process_957(driver,data,analysis_number):
+    for obj in data:
+        if obj.get('NOW CONSUMED'):
+            add_excel_data_957(driver,data=obj,analysis_number=analysis_number)
+def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code):
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl02_lbEdit' and text()='Edit']",by=By.XPATH)
     click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lblTitle")
     data_492 = csv_obj.table492_data
-    for idx,obj in enumerate(data_492):
-        if obj.get('B/E No'):
-            add_excel_data_492(driver,data=obj)
+    data_957 = csv_obj.table957_data
 
+    process_492(driver,data_492)
+    analysis_number = csv_obj.get_analysis_number(hs_code)
+    process_957(driver,data_957,analysis_number)
 def main(data):
     try:
         print('hi')
@@ -427,9 +488,9 @@ def main(data):
                 print(f"Uploading the documents")
                 upload_documents(driver,pdf_path=data.get('pdf_paths'))
                 time.sleep(5)
-                add_item(driver, transaction_id,data=data.get("fty_data"))
+                hs_code = add_item(driver, transaction_id,data=data.get("fty_data"))
                 
-                Non_Duty_Paid_Info(driver,data.get('csv_obj'))
+                Non_Duty_Paid_Info(driver,data.get('csv_obj'),hs_code)
                 print("GD Completed.")
 
         else:
