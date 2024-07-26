@@ -173,8 +173,10 @@ def fill_form(driver : webdriver.Chrome,transaction_id,data={}):
         select_dropdown(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlPortOfShipment",option_text = "Port Qasim (exports), karachi")
         #  Select the Destination Country
         select_dropdown(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlDestinationCountry",option_text = "United States")
+        #  Select the Destination Port
+        select_dropdown_by_value(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlPortOfDischarge",value = "41846")
         # Select the Shipping Line
-        select_dropdown(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlShippingline",option_text = "MEDITERRANIAN SHIPPING COMPANY")
+        select_dropdown_by_value(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlShippingline",value = "66")
         # SET Place of Delivery
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtPlaceofDelivery", "Long Beach, USA")
         # SET Net Weight (MT)
@@ -215,10 +217,6 @@ def fill_form(driver : webdriver.Chrome,transaction_id,data={}):
 
         # Select the Port of Discharge
         # select_port(driver=driver,id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlPortOfDischarge",option_text = "41846")
-        script = open('form.js', 'r')
-        script_to_select = script.read()
-        driver.set_script_timeout(3000)
-        driver.execute_script(script_to_select)
         # Click the Save button
         click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnSaveBottom")
         print(f"GD Filling Success")
@@ -238,6 +236,10 @@ def upload_document(driver : webdriver.Chrome,filepath:os.path.join):
     )
     print("fileButton ready")
     fileButton.send_keys(filepath)
+    if 'fty' in str(filepath).lower():
+        select_dropdown(driver=driver,id="ctl00_ContentPlaceHolder2_GdExportUploadDocUc1_cmbDocumentType",option_text = "Invoice")
+    else:
+        select_dropdown(driver=driver,id="ctl00_ContentPlaceHolder2_GdExportUploadDocUc1_cmbDocumentType",option_text = "Packing List")
     UploadDocButton = WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.XPATH, "//table[.//span[text()='Attached Document']]//input[@id='ctl00_ContentPlaceHolder2_GdExportUploadDocUc1_btnUpload' and @value='Upload']"))
     )
@@ -336,7 +338,9 @@ def process_gd_number_pop_up(driver : webdriver.Chrome,data):
         )
     driver.switch_to.frame(iframe)
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems_ctl02_lblSelect' and text()='Select']",by=By.XPATH)
-    write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('Now Consume'),pop_up=True)
+    Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
+    if data.get('Now Consume') < Quantity:
+        write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('Now Consume'),pop_up=True)
 
 def process_analysis_number_pop_up(driver : webdriver.Chrome,analysis_number):
             # Store the ID of the original window
@@ -375,7 +379,7 @@ def process_analysis_number_pop_up(driver : webdriver.Chrome,analysis_number):
         )
     driver.switch_to.frame(iframe)
     
-def add_excel_data(driver : webdriver.Chrome,data,is_first=False):
+def add_excel_data_492(driver : webdriver.Chrome,data):
     
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
     process_gd_number_pop_up(driver,data)
@@ -386,12 +390,13 @@ def add_excel_data(driver : webdriver.Chrome,data,is_first=False):
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
     )
     print(f"Element in pop up Added.")
-def Non_Duty_Paid_Info(driver,data):
+def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor):
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl02_lbEdit' and text()='Edit']",by=By.XPATH)
     click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lblTitle")
-    for idx,obj in enumerate(data):
+    data_492 = csv_obj.table492_data
+    for idx,obj in enumerate(data_492):
         if obj.get('B/E No'):
-            add_excel_data(driver,data=obj)
+            add_excel_data_492(driver,data=obj)
 
 def main(data):
     try:
@@ -417,7 +422,6 @@ def main(data):
             GD_status, GD_error = select_GDS(driver, transaction_id)
             print(f"GD_status: {GD_status}, GD_error: {GD_error}")
             if GD_status:
-                
                 fill_form_status, fill_form_error = fill_form(driver, transaction_id,data=data)
                 time.sleep(5)
                 print(f"Uploading the documents")
@@ -425,7 +429,7 @@ def main(data):
                 time.sleep(5)
                 add_item(driver, transaction_id,data=data.get("fty_data"))
                 
-                Non_Duty_Paid_Info(driver,data.get('excel_data'))
+                Non_Duty_Paid_Info(driver,data.get('csv_obj'))
                 print("GD Completed.")
 
         else:
@@ -458,7 +462,7 @@ if __name__ == "__main__":
     pl_parser = PlParse(pl_pdf_path)
     fty_parser = FtyParse(fty_pdf_path)
     pdf_paths = [pl_pdf_path, fty_pdf_path]
-    csv_data = get_data_csv(csv_path)
+    csv_obj = CSVDataExtractor(csv_path)
     
     data = {
         'transaction_id': args.transaction_id,
@@ -469,7 +473,7 @@ if __name__ == "__main__":
         'pdf_paths': pdf_paths,
         'pl_data':pl_parser.extracted_data,
         'fty_data':fty_parser.extracted_data,
-        'excel_data':csv_data
+        'csv_obj':csv_obj
     }
 
     required_keys = list(data.keys())

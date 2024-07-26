@@ -33,29 +33,30 @@ def determine_category(description):
 
 # Function to find HS code
 def find_hs_code(description):
+    description = description.lower()
     material_category = determine_category(description)
 
     garment_type = None
     gender_category = None
 
-    if 'T-Shirts' in description:
+    if 't-shirt' in description:
         garment_type = 'T-Shirts'
-    elif 'Shirts' in description:
+    elif 'shirt' in description:
         garment_type = 'Shirts'
-    elif 'Pants' in description:
+    elif 'pant' in description:
         garment_type = 'Pants'
-    elif 'Jackets' in description:
+    elif 'jacket' in description:
         garment_type = 'Jackets'
-    elif 'Track Suits' in description:
+    elif 'track suit' in description:
         garment_type = 'Track Suits'
-    elif 'Pullovers' in description:
+    elif 'pullover' in description:
         garment_type = 'Pullovers'
 
-    if 'Unisex' in description:
+    if 'unisex' in description:
         gender_category = 'Men'
-    elif 'Men' in description:
+    elif 'men' in description:
         gender_category = 'Men'
-    elif 'Women' in description:
+    elif 'women' in description:
         gender_category = 'Women'
     print(f"{gender_category} {material_category} {garment_type}")
     if material_category and garment_type and gender_category:
@@ -142,7 +143,7 @@ def select_dropdown(driver,id,option_text,by=By.ID):
         except Exception as e:
             print(f"Exception: {e}")
             raise e
-def select_port(driver,id,option_text):
+def select_dropdown_by_value(driver,id,value):
     while True:
         try:
             dropdown_elem = WebDriverWait(driver, 10).until(
@@ -150,9 +151,7 @@ def select_port(driver,id,option_text):
             )
             print(f"Found {id} dropdown_elem.")
             dropdown = Select(dropdown_elem)
-            # Wait For the Drop Down Items to appear
-            WebDriverWait(driver, 100).until(lambda driver: option_in_dropdown(dropdown, option_text))
-            dropdown.select_by_value(option_text)
+            dropdown.select_by_value(value)
             wait_for_page_load(driver)
             break
         except StaleElementReferenceException:
@@ -228,6 +227,21 @@ def extract_text(driver, id,by=By.ID):
                 EC.presence_of_element_located((by, id))
             )
             text = elem.get_attribute('value')
+            return text
+        except StaleElementReferenceException:
+            print("StaleElementReferenceException: Trying again...")
+            time.sleep(2)
+        except Exception as e:
+            print(f"Exception: {e}")
+            raise e
+
+def extract_inner_text(driver, id,by=By.ID):
+    while True:
+        try:
+            elem = WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((by, id))
+            )
+            text = elem.text
             return text
         except StaleElementReferenceException:
             print("StaleElementReferenceException: Trying again...")

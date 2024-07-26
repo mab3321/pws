@@ -16,8 +16,6 @@ class PlParse:
         self.pdf =pdfplumber.open(self.pdf_path)
     def find_hscode(self):
         notes = self.extracted_data.get('notes')
-        hs_code = find_hs_code(notes, hs_code_dict)
-        self.extracted_data['hs_code'] = hs_code
     def parse_text(self):
         all_text = []
         for page in self.pdf.pages:
