@@ -53,17 +53,25 @@ def find_hs_code(description):
         garment_type = 'Pullovers'
 
     if 'unisex' in description:
-        gender_category = 'Men'
-    elif 'men' in description:
-        gender_category = 'Men'
+        gender_category = 'Women'
     elif 'women' in description:
         gender_category = 'Women'
+    elif 'men' in description:
+        gender_category = 'Men'
+    
     print(f"{gender_category} {material_category} {garment_type}")
     if material_category and garment_type and gender_category:
         key = f"{gender_category} {material_category} {garment_type}"
         return hs_codes.get(key)
 
     return None
+def categorize_invoice(invoice):
+    if invoice[0].isalpha():
+        return 'non_local'
+    elif invoice[0].isdigit():
+        return 'local'
+    else:
+        raise Exception(f"{invoice } Does not belong to any category .")
 def extract_files():
     current_dir = os.getcwd()
     uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'uploads'))

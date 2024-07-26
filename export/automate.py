@@ -448,8 +448,12 @@ def process_492(driver,data):
             add_excel_data_492(driver,data=obj)
 def process_957(driver,data,analysis_number):
     for obj in data:
-        if obj.get('NOW CONSUMED'):
+        categorize_invoice('KPPE-PF-197684')
+        if categorize_invoice(obj.get('B/E No/PACKAGE NO/PURCHASE INV#')) == 'non_local':
             add_excel_data_957(driver,data=obj,analysis_number=analysis_number)
+        else:
+            print(f"Local Invoice {obj.get('B/E No/PACKAGE NO/PURCHASE INV#')}")
+            continue
 def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code):
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl02_lbEdit' and text()='Edit']",by=By.XPATH)
     click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lblTitle")
