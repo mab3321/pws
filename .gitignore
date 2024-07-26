@@ -1,0 +1,5 @@
+uploads/*
+*.exe
+*.jpg
+*.png
+export/files/*
