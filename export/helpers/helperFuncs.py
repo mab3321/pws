@@ -20,6 +20,49 @@ from .constants import *
 import os
 import shutil
 
+# Function to determine material category
+def determine_category(description):
+    match = re.search(r'(\d+)%\s+(\w+)', description)
+    if match:
+        percentage = int(match.group(1))
+        if percentage >= 80:
+            return '100%'
+        else:
+            return '80/20%'
+    return None
+
+# Function to find HS code
+def find_hs_code(description):
+    material_category = determine_category(description)
+
+    garment_type = None
+    gender_category = None
+
+    if 'T-Shirts' in description:
+        garment_type = 'T-Shirts'
+    elif 'Shirts' in description:
+        garment_type = 'Shirts'
+    elif 'Pants' in description:
+        garment_type = 'Pants'
+    elif 'Jackets' in description:
+        garment_type = 'Jackets'
+    elif 'Track Suits' in description:
+        garment_type = 'Track Suits'
+    elif 'Pullovers' in description:
+        garment_type = 'Pullovers'
+
+    if 'Unisex' in description:
+        gender_category = 'Men'
+    elif 'Men' in description:
+        gender_category = 'Men'
+    elif 'Women' in description:
+        gender_category = 'Women'
+    print(f"{gender_category} {material_category} {garment_type}")
+    if material_category and garment_type and gender_category:
+        key = f"{gender_category} {material_category} {garment_type}"
+        return hs_codes.get(key)
+
+    return None
 def extract_files():
     current_dir = os.getcwd()
     uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'uploads'))
@@ -246,14 +289,6 @@ def final_table(pdf_path):
         
         # Print the combined dictionary with data from the last two pages
         return combined_totals
-
-def find_hs_code(description, hs_code_dict=hs_code_dict, threshold=30):
-    # Find the best match above a certain threshold
-    best_match, score = process.extractOne(description, hs_code_dict.keys())
-    if score > threshold:
-        return str(hs_code_dict[best_match])
-    else:
-        return "6109.1000"
 
 def extract_notes_from_pdf(pdf_path):
     # Open the PDF file
