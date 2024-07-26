@@ -542,7 +542,9 @@ if __name__ == "__main__":
         'pl_data':pl_parser.extracted_data,
         'fty_data':fty_parser.extracted_data,
     }
-    
+    print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table492_data)
+    print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table957_data)
+    print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table1_data)
     required_keys = list(data.keys())
 
     if not all(key in data for key in required_keys):
