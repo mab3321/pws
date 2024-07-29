@@ -49,13 +49,14 @@ def extract_text_after_number(text):
         return None
 # Function to find HS code
 def find_hs_code(description):
-    description = description.lower()
+    description = description.lower().strip().replace('\n', '')
+    print(description)
     material_category = determine_category(description)
 
     garment_type = None
     gender_category = None
 
-    if 't-shirt' in description:
+    if 't-shirt' in description or 't shirt' in description:
         garment_type = 'T-Shirts'
     elif 'shirt' in description:
         garment_type = 'Shirts'

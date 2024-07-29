@@ -272,6 +272,7 @@ def add_item(driver : webdriver.Chrome,transaction_id,data={}):
     print("Clicked Add Items")
     write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtHsCode", data.get('hs_code'))
     write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtDeclaredDescription", data.get("description"))
+    select_dropdown_by_value(driver,'ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_ddlOrigion','586')
     unit_value = (data.get('PO Net Amount')) / (data.get('Quantity'))
     write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtUnitValue", unit_value)
     write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtActualWeight", data.get('Quantity'))
@@ -297,6 +298,7 @@ def add_item(driver : webdriver.Chrome,transaction_id,data={}):
     )
     print("HScode Added")
     return data.get('hs_code')
+
 def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
             # Store the ID of the original window
     original_window = driver.current_window_handle
@@ -358,7 +360,7 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
         if cells:
             select_link = cells[0].find_element(By.TAG_NAME, "a")
             print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
-            if select_link.is_enabled():
+            if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                 select_link.click()
             else:
                 print("Select Link is not enabled")
@@ -436,7 +438,7 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data):
         if cells:
             select_link = cells[0].find_element(By.TAG_NAME, "a")
             print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
-            if select_link.is_enabled():
+            if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                 select_link.click()
                 time.sleep(2)
             else:
@@ -532,9 +534,136 @@ def process_957(driver,data,analysis_number):
             add_excel_data_957(driver,data=obj,analysis_number=analysis_number)
         else:
             print(f"Local Invoice {obj.get('B/E No/PACKAGE NO/PURCHASE INV#')}")
-            continue
-def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code):
-    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl02_lbEdit' and text()='Edit']",by=By.XPATH)
+            add_excel_data_local(driver,data=obj,analysis_number=analysis_number)
+def process_localy_purchased_analysis_no_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code):
+            # Store the ID of the original window
+    original_window = driver.current_window_handle
+
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryUc1_btnAnalysisLookup")
+
+    # Wait for the new window or tab (assume we know a new window opens here)
+    WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
+
+    # Get the list of all window handles
+    windows = driver.window_handles
+
+    # Switch to the new window
+    for window in windows:
+        if window != original_window:
+            driver.switch_to.window(window)
+            break
+
+    # Now you can interact with the new window
+    # For example, finding an element and interacting with it
+    write_text(driver, "txtSearch",analysis_number,pop_up=True)
+    write_text(driver, "txtInputHSCode",hs_code,pop_up=True)
+    click_button(driver, "btnSearch",pop_up=True)
+    time.sleep(3)
+    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+        # Attempt to close the new window
+    try:
+        driver.close()
+    except NoSuchWindowException:
+        print("The new window was already closed.")
+
+    # Switch back to the original window
+    driver.switch_to.window(original_window)
+    iframe = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+        )
+    driver.switch_to.frame(iframe)
+
+def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data):
+            # Store the ID of the original window
+    original_window = driver.current_window_handle
+
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryUc1_btnLocalPurchaseLookup")
+
+    # Wait for the new window or tab (assume we know a new window opens here)
+    WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
+
+    # Get the list of all window handles
+    windows = driver.window_handles
+
+    # Switch to the new window
+    for window in windows:
+        if window != original_window:
+            driver.switch_to.window(window)
+            break
+
+    # Now you can interact with the new window
+    # For example, finding an element and interacting with it
+    write_text(driver, "txtSearch",data.get('B/E No/PACKAGE NO/PURCHASE INV#'),pop_up=True)
+    click_button(driver, "btnSearch",pop_up=True)
+    time.sleep(5)
+    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+        # Attempt to close the new window
+    try:
+        driver.close()
+    except NoSuchWindowException:
+        print("The new window was already closed.")
+
+    # Switch back to the original window
+    driver.switch_to.window(original_window)
+    iframe = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+        )
+    driver.switch_to.frame(iframe)
+    # Locate the table
+    
+    table = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryUc1_dgItems"))
+        )
+
+    # Find all rows in the table body
+    rows = table.find_elements(By.TAG_NAME, "tr")
+
+    row = rows[1]
+    cells = row.find_elements(By.TAG_NAME, "td")
+    if cells:
+        select_link = cells[0].find_element(By.TAG_NAME, "a")
+        print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
+        if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+            select_link.click()
+            time.sleep(2)
+        else:
+            print("Select Link is not enabled")
+            return None
+    else:
+        return None
+    hs_code = extract_text(driver, "ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryUc1_txtHsCode")
+    return hs_code
+
+def add_excel_data_local(driver : webdriver.Chrome,data,analysis_number):
+    # Wait until the image is present
+    image_element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_Image1"))
+    )
+
+    # Get the 'src' attribute of the image
+    image_src = image_element.get_attribute("src")
+    if 'plus' in image_src.lower():
+        click_button(driver,'ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_pnlTitle')
+        time.sleep(1)
+    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_lnkItems' and text()='Attach Locally Purchase Item']",by=By.XPATH)
+    time.sleep(2)
+    
+    hs_code = process_localy_purchased_pop_up_957(driver,data)
+    if hs_code:
+        process_localy_purchased_analysis_no_pop_up_957(driver,analysis_number=analysis_number,hs_code=hs_code)
+        click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
+        time.sleep(1)
+        WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_lblTitle"))
+        )
+        print(f"Element in pop up Added.")
+    else:
+        print(f"HS Code Not Found for {data.get('B/E No/PACKAGE NO/PURCHASE INV#')}")
+        # Cancel the present filling
+        click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnCancelBottom")
+
+def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code,elem_index):
+    click_button(driver=driver,id=f"//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl0{elem_index+1}_lbEdit' and text()='Edit']",by=By.XPATH)
     click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lblTitle")
     data_492 = csv_obj.table492_data
     data_957 = csv_obj.table957_data
@@ -542,10 +671,12 @@ def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code):
     process_492(driver,data_492)
     analysis_number = csv_obj.get_analysis_number(hs_code)
     process_957(driver,data_957,analysis_number)
+    time.sleep(5)
     click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnSaveBottom")
     WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_BasicInfoUc1_pnlTitle"))
     )
+
 def main(data):
     try:
         print('hi')
@@ -577,12 +708,10 @@ def main(data):
                 time.sleep(5)
                 fty_data = data.get('fty_data')
                 items_data = fty_data.get('extracted_data')
-                for item_data in items_data:
+                for idx,item_data in enumerate(items_data):
                     hs_code = add_item(driver, transaction_id,data=item_data)
-                    
-                    Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code)
+                    Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code,elem_index=idx+1)
                     print(f"GD Completed For Item : {item_data}")
-
         else:
             finalMessage = login_form_error
 
@@ -610,7 +739,6 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     pl_pdf_path, fty_pdf_path, csv_path = extract_files_club()
-    print
     fty_parser = PoParse(fty_pdf_path,csv_path=csv_path)
     pl_parser = PlParse(pl_pdf_path)
     pdf_paths = [pl_pdf_path, fty_pdf_path]
@@ -625,9 +753,10 @@ if __name__ == "__main__":
         'pl_data':pl_parser.extracted_data,
         'fty_data':fty_parser.extracted_data,
     }
-    print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table492_data)
-    print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table957_data)
-    print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table1_data)
+    for i in range(len(fty_parser.extracted_data['extracted_data'])):
+        print(i,fty_parser.extracted_data['extracted_data'][1].get('csv_obj').table492_data)
+        print(i,fty_parser.extracted_data['extracted_data'][i].get('csv_obj').table957_data)
+        print(i,fty_parser.extracted_data['extracted_data'][1].get('csv_obj').table1_data)
     required_keys = list(data.keys())
 
     if not all(key in data for key in required_keys):
