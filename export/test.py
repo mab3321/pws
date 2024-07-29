@@ -360,7 +360,7 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
         if cells:
             select_link = cells[0].find_element(By.TAG_NAME, "a")
             print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
-            if select_link.is_enabled():
+            if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                 select_link.click()
             else:
                 print("Select Link is not enabled")
@@ -438,7 +438,7 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data):
         if cells:
             select_link = cells[0].find_element(By.TAG_NAME, "a")
             print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
-            if select_link.is_enabled():
+            if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                 select_link.click()
                 time.sleep(2)
             else:
@@ -623,7 +623,7 @@ def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data):
     if cells:
         select_link = cells[0].find_element(By.TAG_NAME, "a")
         print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
-        if select_link.is_enabled():
+        if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
             select_link.click()
             time.sleep(2)
         else:
@@ -635,8 +635,16 @@ def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data):
     return hs_code
 
 def add_excel_data_local(driver : webdriver.Chrome,data,analysis_number):
-    click_button(driver,'ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_pnlTitle')
-    time.sleep(1)
+    # Wait until the image is present
+    image_element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_Image1"))
+    )
+
+    # Get the 'src' attribute of the image
+    image_src = image_element.get_attribute("src")
+    if 'plus' in image_src.lower():
+        click_button(driver,'ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_pnlTitle')
+        time.sleep(1)
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_lnkItems' and text()='Attach Locally Purchase Item']",by=By.XPATH)
     time.sleep(2)
     
