@@ -333,10 +333,42 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
             EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
         )
     driver.switch_to.frame(iframe)
-    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems_ctl02_lblSelect' and text()='Select']",by=By.XPATH)
+    # Locate the table
+    table = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems"))
+        )
+
+    # Find all rows in the table body
+    rows = table.find_elements(By.TAG_NAME, "tr")
+
+    # Iterate through the rows, skipping the header
+    for row in rows[1:]:
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if cells:
+            unit_value = float(cells[4].text)
+            if int(unit_value) == int(data.get('PER UNIT VALUE')):
+                select_link = cells[0].find_element(By.TAG_NAME, "a")
+                select_link.click()
+                time.sleep(2)
+                break
+    else:
+        # select 1st row
+        row = rows[1]
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if cells:
+            select_link = cells[0].find_element(By.TAG_NAME, "a")
+            print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
+            if select_link.is_enabled():
+                select_link.click()
+            else:
+                print("Select Link is not enabled")
+                return None
+        else:
+            return None
     Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
     if data.get('Now Consume') < Quantity:
         write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('Now Consume'),pop_up=True)
+    return True
 
 def process_gd_number_pop_up_957(driver : webdriver.Chrome,data):
             # Store the ID of the original window
@@ -374,12 +406,50 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data):
             EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
         )
     driver.switch_to.frame(iframe)
-    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems_ctl02_lblSelect' and text()='Select']",by=By.XPATH)
+    # Locate the table
+    table = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems"))
+        )
+
+    # Find all rows in the table body
+    rows = table.find_elements(By.TAG_NAME, "tr")
+
+    # Iterate through the rows, skipping the header
+    for row in rows[1:]:
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if cells:
+            print("The celss text is : ",cells[4].text)
+            try:
+                unit_value = float(cells[4].text)
+                if int(unit_value) == int(data.get('PER UNIT VALUE')):
+                    select_link = cells[0].find_element(By.TAG_NAME, "a")
+                    select_link.click()
+                    time.sleep(2)
+                    break
+            except ValueError:
+                print(f"Skipping row due to non-numeric value: {cells[4].text}")
+    else:
+        print('In rows')
+        # select 1st row
+        row = rows[1]
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if cells:
+            select_link = cells[0].find_element(By.TAG_NAME, "a")
+            print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
+            if select_link.is_enabled():
+                select_link.click()
+                time.sleep(2)
+            else:
+                print("Select Link is not enabled")
+                return None
+        else:
+            return None
     Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
     if data.get('NOW CONSUMED') < Quantity:
         write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('NOW CONSUMED'),pop_up=True)
     hs_code = extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtHsCode")
     return hs_code
+
 def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code):
             # Store the ID of the original window
     original_window = driver.current_window_handle
@@ -417,30 +487,39 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
             EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
         )
     driver.switch_to.frame(iframe)
-    
+
 def add_excel_data_492(driver : webdriver.Chrome,data):
     
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
-    process_gd_number_pop_up_492(driver,data)
+    pop_up_492 = process_gd_number_pop_up_492(driver,data)
+    if pop_up_492:
+        click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
 
-    click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
-
-    WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
-    )
-    print(f"Element in pop up Added.")
+        WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+        )
+        print(f"Element in pop up Added.")
+    else:
+        print(f"HS Code Not Found for {data.get('B/E No')}")
+        # Cancel the present filling
+        click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnCancelBottom")
 
 def add_excel_data_957(driver : webdriver.Chrome,data,analysis_number):
     
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
     hs_code = process_gd_number_pop_up_957(driver,data)
-    process_analysis_number_pop_up_957(driver,analysis_number=analysis_number,hs_code=hs_code)
-    click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
+    if hs_code:
+        process_analysis_number_pop_up_957(driver,analysis_number=analysis_number,hs_code=hs_code)
+        click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
 
-    WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
-    )
-    print(f"Element in pop up Added.")
+        WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+        )
+        print(f"Element in pop up Added.")
+    else:
+        print(f"HS Code Not Found for {data.get('B/E No/PACKAGE NO/PURCHASE INV#')}")
+        # Cancel the present filling
+        click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnCancelBottom")
 
 def process_492(driver,data):
     for idx,obj in enumerate(data):
@@ -463,6 +542,10 @@ def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code):
     process_492(driver,data_492)
     analysis_number = csv_obj.get_analysis_number(hs_code)
     process_957(driver,data_957,analysis_number)
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnSaveBottom")
+    WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_BasicInfoUc1_pnlTitle"))
+    )
 def main(data):
     try:
         print('hi')

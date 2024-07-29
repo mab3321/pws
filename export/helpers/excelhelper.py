@@ -143,7 +143,7 @@ class CSVDataExtractor:
         self.table1_data = self.extract_table_1()
         self.table492_data = self.extract_table_492()
         self.table957_data = self.extract_table_957()
-        self.table957_data = self.extract_table_957()
+        
         self.hs_code_wise_tables = self.extract_hs_code_wise_tables()
     def get_analysis_number(self,hs_code):
         for entry in self.table1_data:
