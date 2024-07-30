@@ -146,13 +146,52 @@ class MultiPOParse:
         self.po_data = []
         self.extract_details()
     def extract_details(self):
-        
+        final_table_list = []
         extracted_data = self.extract_po_numbers_per_invoice(self.pdf_path)
         for invoice_number in extracted_data.keys():
             csv_path = csv_path_of_invoice(self.csv_path, invoice_number[-6:])
             extracted_data[invoice_number]['csv_obj'] = CSVDataExtractor(csv_path)
+            final_table_list.append(extracted_data[invoice_number]['totals'])
+        
         self.po_data = self.load_and_prepare_data()
         self.extracted_data['po_tables'] = extracted_data
+        self.extracted_data['final_table'] = self.summarize_data(final_table_list)
+    def summarize_data(self, data):
+        final_table = {
+            'Quantity': 0.0,
+            'Carton': 0.0,
+            'Gross Weight': 0.0,
+            'Net Weight': 0.0,
+            'Net Net Weight': 0.0,
+            'PO Net Amount': 0.0,
+            'VAT': 0.0,
+            'invoices': ''
+        }
+        
+        invoice_numbers = []
+
+        for item in data:
+            final_table['Quantity'] += item.get('Quantity', 0.0)
+            final_table['Carton'] += item.get('Carton', 0.0)
+            final_table['Gross Weight'] += item.get('Gross Weight', 0.0)
+            final_table['Net Weight'] += item.get('Net Weight', 0.0)
+            final_table['Net Net Weight'] += item.get('Net Net Weight', 0.0)
+            final_table['PO Net Amount'] += item.get('PO Net Amount', 0.0)
+            final_table['VAT'] += item.get('VAT', 0.0)
+            invoice_numbers.append(item.get('invoice_number', ''))
+
+        # Format the invoice numbers
+        formatted_invoices = ''
+        for i in range(0, len(invoice_numbers), 3):
+            formatted_invoices += '-'.join(invoice_numbers[i:i+3])
+            if i + 3 < len(invoice_numbers):
+                formatted_invoices += '\n'
+
+        final_table['invoices'] = formatted_invoices.strip()
+        
+        return final_table
+
+    
     def restructure_data_to_dict_list(self,df):
         """
         Restructures the DataFrame into a list of dictionaries, where each dictionary
@@ -197,7 +236,7 @@ class MultiPOParse:
         # Set the first row (after dropping) as the header
         df.columns = df.iloc[0]
         df = df[1:]
-        print(df)
+        
         data = self.restructure_data_to_dict_list(df)
         
         return data
@@ -294,8 +333,10 @@ class MultiPOParse:
                                 df = pd.DataFrame(table[1:], columns=table[0])
                                 current_po_numbers.extend(df['PO No'].dropna().tolist())
                     totals = self.extract_totals_from_text(previous_pages[:len(previous_pages)-1])
+                    totals['invoice_number'] = previous_invoice_number
                     data_per_invoice[previous_invoice_number] = {
                         'po_numbers': current_po_numbers,
+                        
                         'totals': totals
                     }
                     current_po_numbers = []
@@ -313,6 +354,7 @@ class MultiPOParse:
                             df = pd.DataFrame(table[1:], columns=table[0])
                             current_po_numbers.extend(df['PO No'].dropna().tolist())
                 totals = self.extract_totals_from_text(previous_pages)
+                totals['invoice_number'] = previous_invoice_number
                 data_per_invoice[previous_invoice_number] = {
                     'po_numbers': current_po_numbers,
                     'totals': totals

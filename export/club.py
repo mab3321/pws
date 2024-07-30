@@ -180,13 +180,13 @@ def fill_form(driver : webdriver.Chrome,transaction_id,data={}):
         # SET Place of Delivery
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtPlaceofDelivery", "Long Beach, USA")
         # SET Net Weight (MT)
-        net_weight = fty_data.get("final_table").get("Net Weight") / 1000
+        net_weight = data.get("final_table").get("Net Weight") / 1000
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtNetWeight", net_weight)
         # SET Gross Weight
-        gross_weight = fty_data.get("final_table").get("Gross Weight") / 1000
+        gross_weight = data.get("final_table").get("Gross Weight") / 1000
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtGrossWeight", gross_weight)
         # SET Marks
-        marks = f"""AS PER SHIPPER \n INVOICE NO.\n{fty_data.get("final_table").get('invoices')}"""
+        marks = f"""AS PER SHIPPER \n INVOICE NO.\n{data.get("final_table").get('invoices')}"""
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtMarks", marks)
 
         # financials_info
@@ -199,7 +199,7 @@ def fill_form(driver : webdriver.Chrome,transaction_id,data={}):
         # Select the Currency dropdown
         select_dropdown(driver=driver,id="ctl00_ContentPlaceHolder2_FinancialsUc1_ddlCurrency",option_text = "United States-US $")
         # SET FOB Value
-        write_text(driver, "ctl00_ContentPlaceHolder2_FinancialsUc1_txtFobValue", fty_data.get("final_table").get("PO Net Amount"))
+        write_text(driver, "ctl00_ContentPlaceHolder2_FinancialsUc1_txtFobValue", data.get("final_table").get("PO Net Amount"))
 
         # supporting_info_fill
 
@@ -676,7 +676,22 @@ def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code,elem_index):
     WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_BasicInfoUc1_pnlTitle"))
     )
-
+def process_multi_single(driver,items_data,prev_idx=0):
+    for idx,item_data in enumerate(items_data):
+        hs_code = add_item(driver, 1,data=item_data)
+        Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code,elem_index=idx+1+prev_idx)
+        print(f"GD Completed For Item : {item_data}")
+    return idx
+def process_multi_po(driver,po_data):
+    po_tables = po_data.get('po_tables')
+    invoice_nos = po_tables.keys()
+    for invoice in invoice_nos:
+        items_data = po_tables[invoice].get('po_numbers')
+        for idx,item_data in enumerate(items_data):
+            hs_code = add_item(driver, 1,data=item_data)
+            Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code,elem_index=idx+1)
+            print(f"GD Completed For Item : {item_data}")
+    return idx
 def main(data):
     try:
         print('hi')
@@ -707,11 +722,11 @@ def main(data):
                 upload_documents(driver,pdf_path=data.get('pdf_paths'))
                 time.sleep(5)
                 fty_data = data.get('fty_data')
+                po_data = data.get('po_data')
                 items_data = fty_data.get('extracted_data')
-                for idx,item_data in enumerate(items_data):
-                    hs_code = add_item(driver, transaction_id,data=item_data)
-                    Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code,elem_index=idx+1)
-                    print(f"GD Completed For Item : {item_data}")
+                prev_idx = 0
+                prev_idx = process_multi_po(driver,po_data)
+                process_multi_single(driver,items_data,prev_idx)
         else:
             finalMessage = login_form_error
 
@@ -738,11 +753,15 @@ if __name__ == "__main__":
     parser.add_argument('--amount', type=str, default='10000', help='Amount')
 
     args = parser.parse_args()
-    pl_pdf_path, fty_pdf_path, csv_path = extract_files_club()
-    fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
-    pl_parser = PlParse(pl_pdf_path)
-    pdf_paths = [pl_pdf_path, fty_pdf_path]
+    pl_pdf_path, fty_pdf_path, csv_path = extract_files_club_single()
+    pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = extract_files_club_po()
     
+    fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
+    pl_parser = PlParse(pl_po_pdf_path)
+    po_parser = MultiPOParse(path=fty_po_pdf_path,csv_path=csv_po_path,des_path=desc_po_path)
+    pdf_paths = [pl_pdf_path, fty_pdf_path]
+    final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'],fty_parser.extracted_data['final_table'])
+
     data = {
         'transaction_id': args.transaction_id,
         'user_id': args.user_id,
@@ -752,13 +771,11 @@ if __name__ == "__main__":
         'pdf_paths': pdf_paths,
         'pl_data':pl_parser.extracted_data,
         'fty_data':fty_parser.extracted_data,
+        'po_data':po_parser.extracted_data,
+        'final_table':final_table_data,
     }
-    for i in range(len(fty_parser.extracted_data['extracted_data'])):
-        print(i,fty_parser.extracted_data['extracted_data'][1].get('csv_obj').table492_data)
-        print(i,fty_parser.extracted_data['extracted_data'][i].get('csv_obj').table957_data)
-        print(i,fty_parser.extracted_data['extracted_data'][1].get('csv_obj').table1_data)
+    print(po_parser.extracted_data)
     required_keys = list(data.keys())
-
     if not all(key in data for key in required_keys):
         print("Missing required keys in data dictionary")
         transaction_id = data.get('transaction_id', None)

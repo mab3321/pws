@@ -125,9 +125,9 @@ def extract_files():
         print("Error: Could not find all required files.")
         return None, None, None
 
-def extract_files_club():
+def extract_files_club_single():
     current_dir = os.getcwd()
-    uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi'))
+    uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multisingle'))
     
     pl_pdf_path = None
     fty_pdf_path = None
@@ -161,6 +161,65 @@ def extract_files_club():
         print("Error: Could not find all required files.")
         return None, None, None
 
+def extract_files_club_po():
+    current_dir = os.getcwd()
+    uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multipos'))
+    
+    pl_pdf_path = None
+    fty_pdf_path = None
+    desc_path = None
+    csv_path = None
+    for filename in os.listdir(uploads_dir):
+        if filename.endswith('.pdf') or filename.endswith('.xlsx') or filename.endswith('.csv'):
+            old_filepath = os.path.join(uploads_dir, filename)
+            new_filename = filename.replace('-', '')
+            new_filepath = os.path.join(uploads_dir, new_filename)
+            
+            # Rename file to remove dashes
+            shutil.move(old_filepath, new_filepath)
+            
+            # Assign the renamed file to the appropriate variable
+            if 'fty' in new_filename.lower() and new_filename.endswith('.pdf'):
+                fty_pdf_path = new_filepath
+            elif 'pl' in new_filename.lower() and new_filename.endswith('.pdf'):
+                pl_pdf_path = new_filepath
+            elif new_filename.endswith('.csv'):
+                csv_path = os.path.dirname(os.path.abspath(new_filepath))
+            elif new_filename.endswith('.xlsx'):
+                desc_path = new_filepath
+
+    # Check if the required files were found and assigned
+    if pl_pdf_path and fty_pdf_path and desc_path:
+        print(f"PL PDF Path: {pl_pdf_path}")
+        print(f"FTY PDF Path: {fty_pdf_path}")
+        print(f"CSV Path: {csv_path}")
+        # Return the paths for further use
+        return pl_pdf_path, fty_pdf_path, csv_path,desc_path
+    else:
+        print("Error: Could not find all required files.")
+        return None, None, None, None
+def add_data_dictionaries(dict1, dict2):
+    """
+    Adds values from two dictionaries containing numerical data.
+    For the 'invoices' key, it concatenates the values.
+
+    Args:
+        dict1 (dict): The first dictionary.
+        dict2 (dict): The second dictionary.
+
+    Returns:
+        dict: A dictionary with the summed values or concatenated 'invoices'.
+    """
+    result = {}
+    for key in dict1:
+        if key in dict2:
+            if isinstance(dict1[key], (int, float)) and isinstance(dict2[key], (int, float)):
+                result[key] = dict1[key] + dict2[key]
+            elif key == 'invoices':
+                result[key] = f"{dict1[key]}\n{dict2[key]}"
+            else:
+                result[key] = dict1[key]
+    return result
 def wait_for_page_load(driver, timeout=100):
     # Wait for the updateProgress element's display style to be 'none'
     time.sleep(1)
