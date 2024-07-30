@@ -722,7 +722,7 @@ def main(data):
     finally:
         return driver
 pl_pdf_path, fty_pdf_path, csv_path = extract_files_club()
-fty_parser = PoParse(fty_pdf_path,csv_path=csv_path)
+fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
 pl_parser = PlParse(pl_pdf_path)
 pdf_paths = [pl_pdf_path, fty_pdf_path]
 data = {
@@ -735,9 +735,8 @@ data = {
     'pl_data':pl_parser.extracted_data,
     'fty_data':fty_parser.extracted_data,
 }
-print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table492_data)
-print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table957_data)
-print(fty_parser.extracted_data['extracted_data'][0].get('csv_obj').table1_data)
+print(fty_parser.extracted_data['extracted_data'][0])
+
 required_keys = list(data.keys())
 
 driver = main(data)

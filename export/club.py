@@ -739,7 +739,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     pl_pdf_path, fty_pdf_path, csv_path = extract_files_club()
-    fty_parser = PoParse(fty_pdf_path,csv_path=csv_path)
+    fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
     pl_parser = PlParse(pl_pdf_path)
     pdf_paths = [pl_pdf_path, fty_pdf_path]
     
