@@ -145,6 +145,21 @@ class MultiPOParse:
         self.extracted_data = {}
         self.po_data = []
         self.extract_details()
+    def get_item_info(self, po_number):
+        """
+        Retrieves the 'CTNS' and 'Desc' values for a given PO number from a list of dictionaries.
+
+        Args:
+            data_list (list): The list of dictionaries containing PO data.
+            po_number (int): The PO number to search for.
+
+        Returns:
+            dict: A dictionary with 'CTNS' and 'Desc' for the specified PO number, or None if not found.
+        """
+        for item in self.po_data:
+            if po_number in item:
+                return {'CTNS': item[po_number]['CTNS'], 'description': item[po_number]['Desc'], 'hs_code':find_hs_code(item[po_number]['Desc'])}
+        return None
     def extract_details(self):
         final_table_list = []
         extracted_data = self.extract_po_numbers_per_invoice(self.pdf_path)
@@ -336,7 +351,6 @@ class MultiPOParse:
                     totals['invoice_number'] = previous_invoice_number
                     data_per_invoice[previous_invoice_number] = {
                         'po_numbers': current_po_numbers,
-                        
                         'totals': totals
                     }
                     current_po_numbers = []

@@ -322,6 +322,20 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
     write_text(driver, "txtSearch",data.get('B/E No'),pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(5)
+    table = WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "tblAlert"))
+    )
+    if 'no data found' in table.text.lower():
+        try:
+            driver.close()
+            driver.switch_to.window(original_window)
+            iframe = WebDriverWait(driver, 100).until(
+                    EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+                )
+            driver.switch_to.frame(iframe)
+        except NoSuchWindowException:
+            print("The new window was already closed.")
+        return None
     click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
         # Attempt to close the new window
     try:
@@ -395,6 +409,20 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data):
     write_text(driver, "txtSearch",data.get('B/E No/PACKAGE NO/PURCHASE INV#'),pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(5)
+    table = WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "tblAlert"))
+    )
+    if 'no data found' in table.text.lower():
+        try:
+            driver.close()
+            driver.switch_to.window(original_window)
+            iframe = WebDriverWait(driver, 100).until(
+                    EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+                )
+            driver.switch_to.frame(iframe)
+        except NoSuchWindowException:
+            print("The new window was already closed.")
+        return None
     click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
         # Attempt to close the new window
     try:
@@ -476,6 +504,20 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
     write_text(driver, "txtInputHSCode",hs_code,pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(3)
+    table = WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "tblAlert"))
+    )
+    if 'no data found' in table.text.lower():
+        try:
+            driver.close()
+            driver.switch_to.window(original_window)
+            iframe = WebDriverWait(driver, 100).until(
+                    EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+                )
+            driver.switch_to.frame(iframe)
+        except NoSuchWindowException:
+            print("The new window was already closed.")
+        return None
     click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
         # Attempt to close the new window
     try:
@@ -676,18 +718,39 @@ def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code,elem_index):
     WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_BasicInfoUc1_pnlTitle"))
     )
+
+def Non_Duty_Paid_Info_multi_po(driver,csv_obj:CSVDataExtractor,hs_code,elem_index):
+    click_button(driver=driver,id=f"//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl0{elem_index+1}_lbEdit' and text()='Edit']",by=By.XPATH)
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lblTitle")
+    
+    data_957 = csv_obj.table957_data
+
+    analysis_number = csv_obj.get_analysis_number(hs_code)
+    process_957(driver,data_957,analysis_number)
+    time.sleep(5)
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnSaveBottom")
+    WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_BasicInfoUc1_pnlTitle"))
+    )
+
 def process_multi_single(driver,items_data,prev_idx=0):
     for idx,item_data in enumerate(items_data):
         hs_code = add_item(driver, 1,data=item_data)
         Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code,elem_index=idx+1+prev_idx)
         print(f"GD Completed For Item : {item_data}")
     return idx
-def process_multi_po(driver,po_data):
-    po_tables = po_data.get('po_tables')
+def process_multi_po(driver ,po_obj:MultiPOParse):
+    po_tables = po_obj.extracted_data.get('po_tables')
     invoice_nos = po_tables.keys()
     for invoice in invoice_nos:
         items_data = po_tables[invoice].get('po_numbers')
         for idx,item_data in enumerate(items_data):
+            print(items_data)
+            data_to_send = po_obj.get_item_info(item_data)
+            totals = po_tables[invoice].get('totals')
+            data_to_send.update(po_tables[invoice].get('totals'))
+            print(data_to_send)
+            
             hs_code = add_item(driver, 1,data=item_data)
             Non_Duty_Paid_Info(driver,item_data.get('csv_obj'),hs_code,elem_index=idx+1)
             print(f"GD Completed For Item : {item_data}")
@@ -722,10 +785,10 @@ def main(data):
                 upload_documents(driver,pdf_path=data.get('pdf_paths'))
                 time.sleep(5)
                 fty_data = data.get('fty_data')
-                po_data = data.get('po_data')
+                po_obj = data.get('po_obj')
                 items_data = fty_data.get('extracted_data')
                 prev_idx = 0
-                prev_idx = process_multi_po(driver,po_data)
+                prev_idx = process_multi_po(driver,po_obj)
                 process_multi_single(driver,items_data,prev_idx)
         else:
             finalMessage = login_form_error
@@ -771,7 +834,7 @@ if __name__ == "__main__":
         'pdf_paths': pdf_paths,
         'pl_data':pl_parser.extracted_data,
         'fty_data':fty_parser.extracted_data,
-        'po_data':po_parser.extracted_data,
+        'po_obj':po_parser,
         'final_table':final_table_data,
     }
     print(po_parser.extracted_data)
