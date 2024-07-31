@@ -11,7 +11,11 @@ def read_csv_data(file_path):
     pd.DataFrame: The dataframe containing the CSV data.
     """
     return pd.read_csv(file_path, header=None)
-
+def is_zero(value):
+    try:
+        return float(value) == 0.0
+    except ValueError:
+        return False
 def find_start_row(data, start_text):
     """
     Finds the start row index where the given text is found.
@@ -117,7 +121,7 @@ def filter_sub_table(data):
     sub_table_df = pd.DataFrame(sub_table)
 
     # Filter out rows where "NOW CONSUMED" is NaN
-    sub_table_df = sub_table_df[sub_table_df['NOW CONSUMED'].notna()]
+    sub_table_df = sub_table_df[sub_table_df['NOW CONSUMED'].notna() & ~sub_table_df['NOW CONSUMED'].apply(is_zero)]
 
     # Specify the required columns
     required_columns = ["NOW CONSUMED", "B/E No", "PER UNIT VALUE"]

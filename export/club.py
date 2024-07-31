@@ -388,7 +388,7 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
         else:
             return None
     Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
-    if data.get('Now Consume') < Quantity:
+    if float(data.get('Now Consume')) < Quantity:
         write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('Now Consume'),pop_up=True)
     return True
 
@@ -487,7 +487,7 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=F
         else:
             return None
     Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
-    if data.get('NOW CONSUMED') < Quantity:
+    if float(data.get('NOW CONSUMED')) < Quantity:
         write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('NOW CONSUMED'),pop_up=True)
     hs_code = extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtHsCode")
     return hs_code
