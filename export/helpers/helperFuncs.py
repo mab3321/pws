@@ -220,6 +220,39 @@ def add_data_dictionaries(dict1, dict2):
             else:
                 result[key] = dict1[key]
     return result
+def toggle_NonDutyPaid(driver : webdriver.Chrome, ):
+    image_element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_Image1"))
+    )
+
+    # Get the 'src' attribute of the image
+    image_src = image_element.get_attribute("src")
+    if 'plus' in image_src.lower():
+        click_button(driver,'ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_pnlTitle')
+        time.sleep(1)
+def toggle_LocalPurchaseItem(driver : webdriver.Chrome, ):
+    image_element = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_Image1"))
+    )
+
+    # Get the 'src' attribute of the image
+    image_src = image_element.get_attribute("src")
+    if 'plus' in image_src.lower():
+        click_button(driver,'ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_pnlTitle')
+        time.sleep(1)
+def select_added_item(driver : webdriver.Chrome):
+    table = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, 'ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems'))
+)
+    rows = table.find_elements(By.TAG_NAME, 'tr')
+
+    # Get the last row (excluding the header row)
+    last_row = rows[-2]
+
+    # Find the "Edit" button in the last row and click it
+    edit_button = last_row.find_element(By.LINK_TEXT, 'Edit')
+    edit_button.click()
+
 def wait_for_page_load(driver, timeout=100):
     # Wait for the updateProgress element's display style to be 'none'
     time.sleep(1)
