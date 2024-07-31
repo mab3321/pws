@@ -6,3 +6,4 @@ export/files/*
 *.venv
 club/
 multi
+*ipynb
