@@ -567,7 +567,7 @@ def add_excel_data_957(driver : webdriver.Chrome,data,analysis_number,is_hscode_
         be_no = 'B/E No'
     toggle_NonDutyPaid(driver)
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
-    hs_code = process_gd_number_pop_up_957(driver,data)
+    hs_code = process_gd_number_pop_up_957(driver,data,is_hscode_wise)
     if hs_code:
         process_analysis_number_pop_up_957(driver,analysis_number=analysis_number,hs_code=hs_code)
         click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
@@ -647,7 +647,10 @@ def process_localy_purchased_analysis_no_pop_up_957(driver : webdriver.Chrome,an
         )
     driver.switch_to.frame(iframe)
     return True
-def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data):
+def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=False):
+    be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
+    if is_hscode_wise:
+        be_no = 'B/E No'
             # Store the ID of the original window
     original_window = driver.current_window_handle
 
@@ -667,7 +670,7 @@ def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data):
 
     # Now you can interact with the new window
     # For example, finding an element and interacting with it
-    write_text(driver, "txtSearch",data.get('B/E No/PACKAGE NO/PURCHASE INV#'),pop_up=True)
+    write_text(driver, "txtSearch",data.get(be_no),pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(5)
     table = WebDriverWait(driver, 100).until(
@@ -711,7 +714,7 @@ def process_localy_purchased_pop_up_957(driver : webdriver.Chrome,data):
     if cells:
 
         select_link = cells[0].find_element(By.TAG_NAME, "a")
-        print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No/PACKAGE NO/PURCHASE INV#')} Selecting 1st row")
+        print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get(be_no)} Selecting 1st row")
         if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
             select_link.click()
             time.sleep(2)
@@ -732,7 +735,7 @@ def add_excel_data_local(driver : webdriver.Chrome,data,analysis_number,is_hscod
     click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_LocalPurchaseItemEntryInfoUc1_lnkItems' and text()='Attach Locally Purchase Item']",by=By.XPATH)
     time.sleep(2)
     
-    hs_code = process_localy_purchased_pop_up_957(driver,data)
+    hs_code = process_localy_purchased_pop_up_957(driver,data,is_hscode_wise)
     if hs_code:
         res_957 = process_localy_purchased_analysis_no_pop_up_957(driver,analysis_number=analysis_number,hs_code=hs_code)
         if res_957:
@@ -768,10 +771,11 @@ def Non_Duty_Paid_Info(driver,csv_obj:CSVDataExtractor,hs_code,elem_index):
     )
 
 def Non_Duty_Paid_Info_multi_po(driver,csv_obj:CSVDataExtractor,hs_code,elem_index):
-    click_button(driver=driver,id=f"//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_dgItems_ctl0{elem_index+1}_lbEdit' and text()='Edit']",by=By.XPATH)
-    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lblTitle")
+    select_added_item(driver)
+    toggle_NonDutyPaid(driver)
     
-    data_957 = csv_obj.table957_data
+    data_957_hs_code_wise = csv_obj.hs_code_wise_tables.get(hs_code)
+    data_957 = data_957_hs_code_wise.get('sub_table')
 
     analysis_number = csv_obj.get_analysis_number(hs_code)
     process_957(driver,data_957,analysis_number,is_hscode_wise=True)

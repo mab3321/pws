@@ -145,6 +145,7 @@ class CSVDataExtractor:
         self.table957_data = self.extract_table_957()
         
         self.hs_code_wise_tables = self.extract_hs_code_wise_tables()
+
     def get_analysis_number(self,hs_code):
         for entry in self.table1_data:
             if entry['HS CODE:'] == hs_code:
