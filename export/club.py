@@ -562,20 +562,28 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
 
 def add_excel_data_492(driver : webdriver.Chrome,data):
     # Wait until the image is present
-    toggle_NonDutyPaid(driver)
-    click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
-    pop_up_492 = process_gd_number_pop_up_492(driver,data)
-    if pop_up_492:
-        click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
+    try:
+        toggle_NonDutyPaid(driver)
+        click_button(driver=driver,id="//a[@id='ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_lnkItems' and text()='Attach Item']",by=By.XPATH)
+        pop_up_492 = process_gd_number_pop_up_492(driver,data)
+        if pop_up_492:
+            click_button(driver=driver,id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']",by=By.XPATH)
 
-        WebDriverWait(driver, 100).until(
-            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
-        )
-        print(f"Element in pop up Added.")
-    else:
-        print(f"HS Code Not Found for {data.get('B/E No')}")
+            WebDriverWait(driver, 100).until(
+                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+            )
+            print(f"Element in pop up Added.")
+        else:
+            print(f"HS Code Not Found for {data.get('B/E No')}")
+            # Cancel the present filling
+            click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnCancelBottom")
+    except:
+        print(f"Got Error for {data.get('B/E No')}")
         # Cancel the present filling
         click_button(driver=driver,id="ctl00_ContentPlaceHolder2_btnCancelBottom")
+        WebDriverWait(driver, 100).until(
+                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+            )
 
 def add_excel_data_957(driver : webdriver.Chrome,data,analysis_number,is_hscode_wise=False):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
