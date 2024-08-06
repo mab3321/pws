@@ -71,9 +71,9 @@ def find_hs_code(description):
 
     if 'unisex' in description:
         gender_category = 'Women'
-    elif 'women' in description:
+    elif 'women' in description or 'ladies' in description or 'girl' in description:
         gender_category = 'Women'
-    elif 'men' in description:
+    elif 'men' in description or 'gentle' in description or 'boy'  in description:
         gender_category = 'Men'
     
     print(f"{gender_category} {material_category} {garment_type}")

@@ -14,15 +14,16 @@ from helpers import *
 import os
 from datetime import datetime
 from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
-
+from chromedriver_py import binary_path
 def setup_driver():
+    svc = webdriver.ChromeService(executable_path=binary_path)
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--disable-gpu')
     # chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-software-rasterizer')
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options,service=svc)
+    
     return driver
 
 def exemptions(driver: webdriver.Chrome):
