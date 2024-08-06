@@ -60,7 +60,7 @@ def find_hs_code(description):
         garment_type = 'T-Shirts'
     elif 'shirt' in description:
         garment_type = 'Shirts'
-    elif 'pant' in description:
+    elif 'pant' in description or 'shorts' in description:
         garment_type = 'Pants'
     elif 'jacket' in description:
         garment_type = 'Jackets'
@@ -73,7 +73,7 @@ def find_hs_code(description):
         gender_category = 'Women'
     elif 'women' in description or 'ladies' in description or 'girl' in description:
         gender_category = 'Women'
-    elif 'men' in description or 'gentle' in description or 'boy'  in description:
+    elif 'men' in description or 'gentle' in description or 'boy' in description or 'kid' in description:
         gender_category = 'Men'
     
     print(f"{gender_category} {material_category} {garment_type}")

@@ -158,7 +158,8 @@ class MultiPOParse:
         """
         for item in self.po_data:
             if po_number in item:
-                return {'CTNS': item[po_number]['CTNS'], 'description': item[po_number]['Desc'], 'hs_code':find_hs_code(item[po_number]['Desc'])}
+                
+                return {'CTNS': item[po_number]['CTNS'],'PCS':item[po_number]['PCS'], 'description': item[po_number]['Desc'], 'hs_code':find_hs_code(item[po_number]['Desc'])}
         return None
     def extract_details(self):
         final_table_list = []
