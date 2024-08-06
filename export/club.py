@@ -354,11 +354,11 @@ def add_item(driver: webdriver.Chrome, transaction_id, data={}):
     return data.get('hs_code')
 
 
-def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
-    # Store the ID of the original window
+def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
+            # Store the ID of the original window
     original_window = driver.current_window_handle
 
-    click_button(driver=driver, id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnGDLookup")
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnGDLookup")
 
     # Wait for the new window or tab (assume we know a new window opens here)
     WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
@@ -374,8 +374,8 @@ def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
 
     # Now you can interact with the new window
     # For example, finding an element and interacting with it
-    write_text(driver, "txtSearch", data.get('B/E No'), pop_up=True)
-    click_button(driver, "btnSearch", pop_up=True)
+    write_text(driver, "txtSearch",data.get('B/E No'),pop_up=True)
+    click_button(driver, "btnSearch",pop_up=True)
     time.sleep(5)
     table = WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "tblAlert"))
@@ -385,14 +385,14 @@ def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
             driver.close()
             driver.switch_to.window(original_window)
             iframe = WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
-            )
+                    EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+                )
             driver.switch_to.frame(iframe)
         except NoSuchWindowException:
             print("The new window was already closed.")
         return None
-    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']", by=By.XPATH, pop_up=True)
-    # Attempt to close the new window
+    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+        # Attempt to close the new window
     try:
         driver.close()
     except NoSuchWindowException:
@@ -401,13 +401,13 @@ def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
     # Switch back to the original window
     driver.switch_to.window(original_window)
     iframe = WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
-    )
+            EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+        )
     driver.switch_to.frame(iframe)
     # Locate the table
     table = WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems"))
-    )
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems"))
+        )
 
     # Find all rows in the table body
     rows = table.find_elements(By.TAG_NAME, "tr")
@@ -419,7 +419,7 @@ def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
             try:
                 unit_value = float(cells[4].text)
                 puv = float(data.get('PER UNIT VALUE'))
-                if math.isclose(unit_value, puv, rel_tol=1e-9):
+                if math.isclose(unit_value, puv, rel_tol=0.1):
                     select_link = cells[0].find_element(By.TAG_NAME, "a")
                     if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                         select_link.click()
@@ -435,8 +435,7 @@ def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
         cells = row.find_elements(By.TAG_NAME, "td")
         if cells:
             select_link = cells[0].find_element(By.TAG_NAME, "a")
-            print(
-                f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No')} Selecting 1st row")
+            print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get('B/E No')} Selecting 1st row")
             if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                 select_link.click()
             else:
@@ -446,26 +445,24 @@ def process_gd_number_pop_up_492(driver: webdriver.Chrome, data):
             return None
     try:
         Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
-    except:
+    except :
         Quantity = 0.0
     try:
         CONSUMED = float(data.get('NOW CONSUMED'))
-    except:
+    except :
         CONSUMED = 0.0
     if CONSUMED < Quantity:
-        write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity", data.get('Now Consume'),
-                   pop_up=True)
+        write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('Now Consume'),pop_up=True)
     return True
 
-
-def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=False):
+def process_gd_number_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=False):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
         be_no = 'B/E No'
-        # Store the ID of the original window
+            # Store the ID of the original window
     original_window = driver.current_window_handle
 
-    click_button(driver=driver, id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnGDLookup")
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnGDLookup")
 
     # Wait for the new window or tab (assume we know a new window opens here)
     WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
@@ -481,8 +478,8 @@ def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=
 
     # Now you can interact with the new window
     # For example, finding an element and interacting with it
-    write_text(driver, "txtSearch", data.get(be_no), pop_up=True)
-    click_button(driver, "btnSearch", pop_up=True)
+    write_text(driver, "txtSearch",data.get(be_no),pop_up=True)
+    click_button(driver, "btnSearch",pop_up=True)
     time.sleep(5)
     table = WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "tblAlert"))
@@ -492,14 +489,14 @@ def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=
             driver.close()
             driver.switch_to.window(original_window)
             iframe = WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
-            )
+                    EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+                )
             driver.switch_to.frame(iframe)
         except NoSuchWindowException:
             print("The new window was already closed.")
         return None
-    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']", by=By.XPATH, pop_up=True)
-    # Attempt to close the new window
+    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+        # Attempt to close the new window
     try:
         driver.close()
     except NoSuchWindowException:
@@ -508,13 +505,13 @@ def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=
     # Switch back to the original window
     driver.switch_to.window(original_window)
     iframe = WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
-    )
+            EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+        )
     driver.switch_to.frame(iframe)
     # Locate the table
     table = WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems"))
-    )
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_dgItems"))
+        )
 
     # Find all rows in the table body
     rows = table.find_elements(By.TAG_NAME, "tr")
@@ -523,11 +520,11 @@ def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=
     for row in rows[1:]:
         cells = row.find_elements(By.TAG_NAME, "td")
         if cells:
-            print("The celss text is : ", cells[4].text)
+            print("The celss text is : ",cells[4].text)
             try:
                 unit_value = float(cells[4].text)
                 puv = float(data.get('PER UNIT VALUE'))
-                if math.isclose(unit_value, puv, rel_tol=1e-9):
+                if math.isclose(unit_value, puv, rel_tol=0.1):
                     select_link = cells[0].find_element(By.TAG_NAME, "a")
                     if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                         select_link.click()
@@ -544,8 +541,7 @@ def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=
         cells = row.find_elements(By.TAG_NAME, "td")
         if cells:
             select_link = cells[0].find_element(By.TAG_NAME, "a")
-            print(
-                f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get(be_no)} Selecting 1st row")
+            print(f"No matching row found in the table for PER UNIT VALUE {data.get('PER UNIT VALUE')} and {data.get(be_no)} Selecting 1st row")
             if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
                 select_link.click()
                 time.sleep(5)
@@ -556,24 +552,22 @@ def process_gd_number_pop_up_957(driver: webdriver.Chrome, data, is_hscode_wise=
             return None
     try:
         Quantity = float(extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity"))
-    except:
+    except :
         Quantity = 0.0
     try:
         CONSUMED = float(data.get('NOW CONSUMED'))
-    except:
+    except :
         CONSUMED = 0.0
     if CONSUMED < Quantity:
-        write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity", data.get('NOW CONSUMED'),
-                   pop_up=True)
+        write_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtQuantity",data.get('NOW CONSUMED'),pop_up=True)
     hs_code = extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtHsCode")
     return hs_code
 
-
-def process_analysis_number_pop_up_957(driver: webdriver.Chrome, analysis_number, hs_code):
-    # Store the ID of the original window
+def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code):
+            # Store the ID of the original window
     original_window = driver.current_window_handle
 
-    click_button(driver=driver, id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnAnalysisLookup")
+    click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnAnalysisLookup")
 
     # Wait for the new window or tab (assume we know a new window opens here)
     WebDriverWait(driver, 10).until(EC.number_of_windows_to_be(2))
@@ -589,9 +583,9 @@ def process_analysis_number_pop_up_957(driver: webdriver.Chrome, analysis_number
 
     # Now you can interact with the new window
     # For example, finding an element and interacting with it
-    write_text(driver, "txtSearch", analysis_number, pop_up=True)
-    write_text(driver, "txtInputHSCode", hs_code, pop_up=True)
-    click_button(driver, "btnSearch", pop_up=True)
+    write_text(driver, "txtSearch",analysis_number,pop_up=True)
+    write_text(driver, "txtInputHSCode",hs_code,pop_up=True)
+    click_button(driver, "btnSearch",pop_up=True)
     time.sleep(3)
     table = WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "tblAlert"))
@@ -601,15 +595,14 @@ def process_analysis_number_pop_up_957(driver: webdriver.Chrome, analysis_number
             driver.close()
             driver.switch_to.window(original_window)
             iframe = WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
-            )
+                    EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+                )
             driver.switch_to.frame(iframe)
         except NoSuchWindowException:
             print("The new window was already closed.")
         return None
-    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']", by=By.XPATH,
-                 pop_up=True)
-    # Attempt to close the new window
+    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+        # Attempt to close the new window
     try:
         driver.close()
     except NoSuchWindowException:
@@ -618,8 +611,8 @@ def process_analysis_number_pop_up_957(driver: webdriver.Chrome, analysis_number
     # Switch back to the original window
     driver.switch_to.window(original_window)
     iframe = WebDriverWait(driver, 100).until(
-        EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
-    )
+            EC.presence_of_element_located((By.XPATH, "(//*[@id='frame'])[1]"))
+        )
     driver.switch_to.frame(iframe)
     time.sleep(2)
     wait_for_page_load(driver)
@@ -979,7 +972,9 @@ def main(data):
                 po_obj = data.get('po_obj')
                 items_data = fty_data.get('extracted_data')
                 prev_idx = 0
+                print(f"Starting the Multi PO Process")
                 prev_idx = process_multi_po(driver,po_obj)
+                print(f"Now Starting the Multi Single Process")
                 process_multi_single(driver,items_data,prev_idx)
         else:
             finalMessage = login_form_error

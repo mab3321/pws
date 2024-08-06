@@ -7,3 +7,4 @@ export/files/*
 club/
 multi
 *ipynb
+.idea/
