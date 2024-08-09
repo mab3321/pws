@@ -7,3 +7,4 @@ pandas~=1.4.4
 numpy~=1.26.1
 webdriver-manager~=3.8.6
 chromedriver-py
+flask~=3.0.3
