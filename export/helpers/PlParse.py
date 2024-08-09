@@ -31,8 +31,10 @@ class PlParse:
     def data_from_top_box(self):
         pattern_invoice = r'Invoice Number Log No\n(.+?)\s+(\S+)$'
         pattern_date = r'Document Date Invoice Date\n(.+?)\s+(\S+)$'
+        pattern_dest = r'Destination To Forwarder Ship Mode\n(.+?)\s+(\S+)$'
         invoice_match = re.search(pattern_invoice, self.text, re.MULTILINE)
         date_match = re.search(pattern_date, self.text, re.MULTILINE)
+        destination_match = re.search(pattern_dest, self.text,re.MULTILINE)
         if invoice_match:
             invoice_number = invoice_match.group(1).strip()
             invoice_number = invoice_number.split(' ')[-1]
@@ -40,9 +42,20 @@ class PlParse:
         else:
             invoice_number = None
             log_no = None
+        if destination_match:
+            destination_line = destination_match.group(1).strip()
+            print(destination_line)
+            # Split the line into words
+            words = destination_line.split(' ')
+
+            # Concatenate the remaining words back into a single string
+            destination = words[0]
+        else:
+            destination = None
         # Add parsed data to the extracted_data dictionary
         self.extracted_data["Invoice Number"] = invoice_number
         self.extracted_data["Log No"] = log_no
+        self.extracted_data["destination"] = destination
         if date_match:
             document_date = date_match.group(1).strip()
             invoice_date = date_match.group(2).strip()

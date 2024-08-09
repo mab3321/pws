@@ -34,7 +34,7 @@ def exemptions(driver: webdriver.Chrome):
     # Add SROs/Exemptions
     click_button(driver=driver, id="ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_dgExemptions_ctl02_lnkBtnAdd")
     select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_dgExemptions_ctl02_ddlExemption",
-                    option_text=r"SRO803(I)/2006-1-0-0-01/07/2006 ( 0 )")
+                    option_text=r"SRO492(I)/2006 -1-0-0-26/05/2006 ( 0 )")
     click_button(driver=driver, id="ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_dgExemptions_ctl02_lnkBtnAdd")
 
     # Add another
@@ -233,7 +233,7 @@ def fill_form(driver: webdriver.Chrome, transaction_id, data={}):
 
         # Select the Shed/Location Code dropdown
         select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_SupportingInfoUc1_ddlExaminerGroup",
-                        option_text="M/S. D.P. World Off-Dock Terminal")
+                        option_text="IC3")
         # Select the ddlTerminal dropdown
         select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_SupportingInfoUc1_ddlTerminal",
                         option_text="Qasim International Container Terminal")
@@ -317,13 +317,20 @@ def fill_container_info(driver: webdriver.Chrome, data={}):
                  by=By.XPATH)
 
 
-def add_item(driver: webdriver.Chrome, transaction_id, data={}):
+def add_item(driver: webdriver.Chrome, transaction_id, data={},item_no=None):
     print(f"For transaction_id {transaction_id} Adding Item...")
     click_button(driver=driver, id="//a[@id='ctl00_ContentPlaceHolder2_ItemInfoUc1_lnkItems' and text()='Add Items']",
                  by=By.XPATH)
     print("Clicked Add Items")
     write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtHsCode", data.get('hs_code'))
-    write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtDeclaredDescription", data.get("description"))
+    description = data.get('description')
+    if item_no:
+        additional_text = "UNDER CLAIM FOR 'DRAWBACK' OF LOCAL TAXES AND BRAND NOTIFICATION NO. 3(1) TID/09-P-I DATED: 01.09.2009 IMPORTED MATERIAL USED UNDER EFS SRO 957(I)21 DT.30.07.2021) (DETAILS AS PER INVOICE) INVOICE NO."
+        description = f"{description} \n {additional_text} {data.get('invoice_number')}"
+    else:
+        additional_text = "(DETAILS AS PER INVOICE) INVOICE NO. "
+        description = f"{description} \n {additional_text} {data.get('invoice_number')}"
+    write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtDeclaredDescription", description)
     select_dropdown_by_value(driver, 'ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_ddlOrigion', '586')
     unit_value = (data.get('PO Net Amount')) / (data.get('Quantity'))
     write_text(driver, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_txtUnitValue", unit_value)
@@ -334,7 +341,7 @@ def add_item(driver: webdriver.Chrome, transaction_id, data={}):
     print("filling the exemptions")
     exemptions(driver)
     # Check	BLEACHED BLENDED GARMENTS, WEARING APPAREL (ALL BLENDS OF POLYESTER STAPLE FIBRE AND COTTON FIBRE).
-    checkbox(driver, id="ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_dgSro_ctl03_chkSro")
+    process_duty_drawback(driver, data.get('description',''))
     # Now Handel Quantity (for Assessment Purpose)
     time.sleep(5)
     WebDriverWait(driver, 100).until(
@@ -899,7 +906,8 @@ def Non_Duty_Paid_Info_multi_po(driver, csv_obj: CSVDataExtractor, hs_code, elem
 
 def process_multi_single(driver, items_data, prev_idx=0):
     for idx, item_data in enumerate(items_data):
-        hs_code = add_item(driver, 1, data=item_data)
+        item_no=True if idx == 0 else None
+        hs_code = add_item(driver, 1, data=item_data, item_no=item_no)
         Non_Duty_Paid_Info(driver, item_data.get('csv_obj'), hs_code, elem_index=idx + 1 + prev_idx)
         print(f"GD Completed For Item : {item_data}")
     return idx
@@ -917,6 +925,7 @@ def process_multi_po(driver, po_obj: MultiPOParse):
             data_to_send = po_obj.get_item_info(int(item_data))
             totals = po_tables[invoice].get('totals')
             csv_obj = po_tables[invoice].get('csv_obj')
+            data_to_send['invoice_number'] = str(invoice)
             data_to_send['csv_obj'] = csv_obj
             data_to_send.update(totals)
             data_to_send['Carton'] = data_to_send['CTNS']
@@ -925,7 +934,10 @@ def process_multi_po(driver, po_obj: MultiPOParse):
             if not data_to_send.get('hs_code'):
                 continue
             else:
-                add_item(driver, 1, data=data_to_send)
+                if idx == 0:
+                    add_item(driver, 1, data=data_to_send,item_no=True)
+                else:
+                    add_item(driver, 1, data=data_to_send)
 
                 if idx == 0:
                     Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=data_to_send.get('hs_code'),
@@ -941,7 +953,7 @@ def process_multi_po(driver, po_obj: MultiPOParse):
     return idx
 def main(data):
     try:
-        print('hi')
+        print('Starting the process')
         finalStatus = False
         finalMessage =''
         driver = setup_driver()
@@ -970,12 +982,16 @@ def main(data):
                 time.sleep(5)
                 fty_data = data.get('fty_data')
                 po_obj = data.get('po_obj')
-                items_data = fty_data.get('extracted_data')
+                
                 prev_idx = 0
                 print(f"Starting the Multi PO Process")
-                prev_idx = process_multi_po(driver,po_obj)
-                print(f"Now Starting the Multi Single Process")
-                process_multi_single(driver,items_data,prev_idx)
+                if po_obj:
+                    print(f"Starting the Multi PO Process")
+                    prev_idx = process_multi_po(driver,po_obj)
+                if fty_data:
+                    items_data = fty_data.get('extracted_data')
+                    print(f"Now Starting the Multi Single Process")
+                    process_multi_single(driver,items_data,prev_idx)
         else:
             finalMessage = login_form_error
 
@@ -984,7 +1000,7 @@ def main(data):
         finalStatus = False
         finalMessage = str(e)
     finally:
-        # driver.quit()
+        driver.quit()
         return finalStatus, finalMessage
     
 if __name__ == "__main__":
@@ -1004,13 +1020,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
     pl_pdf_path, fty_pdf_path, csv_path = extract_files_club_single()
     pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = extract_files_club_po()
+    if fty_pdf_path:
+        fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
+        pl_parser = PlParse(pl_pdf_path)
+        pdf_paths = [pl_pdf_path, fty_pdf_path]
+    if pl_po_pdf_path:
+        pl_parser = PlParse(pl_po_pdf_path)
+        po_parser = MultiPOParse(path=fty_po_pdf_path,csv_path=csv_po_path,des_path=desc_po_path)
+        pdf_paths = [fty_po_pdf_path, pl_po_pdf_path]
     
-    fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
-    pl_parser = PlParse(pl_po_pdf_path)
-    po_parser = MultiPOParse(path=fty_po_pdf_path,csv_path=csv_po_path,des_path=desc_po_path)
-    pdf_paths = [pl_pdf_path, fty_pdf_path]
     final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'],fty_parser.extracted_data['final_table'])
-
+    
     data = {
         'transaction_id': args.transaction_id,
         'user_id': args.user_id,
@@ -1023,7 +1043,8 @@ if __name__ == "__main__":
         'po_obj':po_parser,
         'final_table':final_table_data,
     }
-    print(po_parser.extracted_data)
+    print(pl_parser.extracted_data)
+    
     required_keys = list(data.keys())
     if not all(key in data for key in required_keys):
         print("Missing required keys in data dictionary")

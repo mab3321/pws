@@ -128,7 +128,10 @@ def extract_files():
 def extract_files_club_single():
     current_dir = os.getcwd()
     uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multisingle'))
-    
+    # Check if the directory is empty
+    if not os.listdir(uploads_dir):
+        print("Directory is empty.")
+        return None, None, None
     pl_pdf_path = None
     fty_pdf_path = None
     csv_path = None
@@ -161,10 +164,39 @@ def extract_files_club_single():
         print("Error: Could not find all required files.")
         return None, None, None
 
+def process_duty_drawback(driver,description):
+    table = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnldutydrawback"))
+        )
+
+    # Find all rows in the table body
+    rows = table.find_elements(By.TAG_NAME, "tr")
+
+    # Iterate through the rows, skipping the header
+    for row in rows[2:]:
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if 'dye' in description.lower() and 'dyed or printed' in cells[1].text.lower():
+            cells[0].click()
+            return True
+        elif 'white' in description.lower() and 'bleached blended' in cells[1].text.lower():
+            cells[0].click()
+            return True
+        elif '100' in description.lower() and 'polyester' in description.lower() and 'grey blended' in cells[1].text.lower():
+            cells[2].click()
+            return True
+    else:
+        row = rows[2]
+        cells = row.find_elements(By.TAG_NAME, "td")
+        cells[0].click()
+        return True
+
 def extract_files_club_po():
     current_dir = os.getcwd()
     uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multipos'))
-    
+    # Check if the directory is empty
+    if not os.listdir(uploads_dir):
+        print("Directory is empty.")
+        return None, None, None
     pl_pdf_path = None
     fty_pdf_path = None
     desc_path = None
