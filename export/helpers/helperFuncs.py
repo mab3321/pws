@@ -178,7 +178,7 @@ def process_duty_drawback(driver,description):
         if 'dye' in description.lower() and 'dyed or printed' in cells[1].text.lower():
             cells[0].click()
             return True
-        elif 'white' in description.lower() and 'bleached blended' in cells[1].text.lower():
+        elif 'white' in description.lower() and 'shirt' in description.lower() and 'bleached blended' in cells[1].text.lower():
             cells[0].click()
             return True
         elif '100' in description.lower() and 'polyester' in description.lower() and 'grey blended' in cells[1].text.lower():
@@ -251,6 +251,22 @@ def add_data_dictionaries(dict1, dict2):
                 result[key] = f"{dict1[key]}\n{dict2[key]}"
             else:
                 result[key] = dict1[key]
+    # Split the original string by newline characters and then by hyphens
+    invoices_list = [item.split('-') for item in result.get('invoices').split('\n')]
+
+    # Flatten the list
+    invoices_flat = [item for sublist in invoices_list for item in sublist]
+
+    # Initialize an empty list to store the formatted invoice groups
+    formatted_invoices = []
+
+    # Group invoices in sets of three
+    for i in range(0, len(invoices_flat), 3):
+        formatted_invoices.append('-'.join(invoices_flat[i:i+3]))
+
+    # Join the grouped invoices with newline characters
+    formatted_output = '\n'.join(formatted_invoices)
+    result['invoices'] = formatted_output
     return result
 def toggle_NonDutyPaid(driver : webdriver.Chrome, ):
     image_element = WebDriverWait(driver, 10).until(

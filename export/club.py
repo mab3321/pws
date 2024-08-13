@@ -183,8 +183,10 @@ def fill_form(driver: webdriver.Chrome, transaction_id, data={}):
         select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlConsignmentMode",
                         option_text="Part Shipment")
         # SET the BL/AWB No (Invoice No Last Six digits)
+        invoices = data.get("final_table").get('invoices')
+        bl_awb_no = invoices.split("\n")[0]
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtBlNo",
-                   fty_data.get("extracted_data")[0].get('invoice_number'))
+                   bl_awb_no)
         #  SET the BL/AWB Date (Invoice Date)
         # Parse the date string into a datetime object
         date_object = datetime.strptime(fty_data.get("extracted_data")[0].get('invoice_date'), "%Y-%m-%d")
@@ -209,7 +211,7 @@ def fill_form(driver: webdriver.Chrome, transaction_id, data={}):
         gross_weight = data.get("final_table").get("Gross Weight") / 1000
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtGrossWeight", gross_weight)
         # SET Marks
-        marks = f"""AS PER SHIPPER \n INVOICE NO.\n{data.get("final_table").get('invoices')}"""
+        marks = f"""AS PER SHIPPER \n INVOICE NO.\n{invoices}"""
         write_text(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtMarks", marks)
 
         # financials_info
@@ -1024,12 +1026,17 @@ if __name__ == "__main__":
         fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
         pl_parser = PlParse(pl_pdf_path)
         pdf_paths = [pl_pdf_path, fty_pdf_path]
-    if pl_po_pdf_path:
+    if fty_po_pdf_path:
         pl_parser = PlParse(pl_po_pdf_path)
         po_parser = MultiPOParse(path=fty_po_pdf_path,csv_path=csv_po_path,des_path=desc_po_path)
         pdf_paths = [fty_po_pdf_path, pl_po_pdf_path]
-    
-    final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'],fty_parser.extracted_data['final_table'])
+    if fty_pdf_path and fty_po_pdf_path:
+        final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'],fty_parser.extracted_data['final_table'])
+    elif fty_pdf_path:
+        final_table_data = fty_parser.extracted_data['final_table']
+    else:
+        final_table_data = po_parser.extracted_data['final_table']
+    print(final_table_data)
     
     data = {
         'transaction_id': args.transaction_id,
@@ -1043,7 +1050,6 @@ if __name__ == "__main__":
         'po_obj':po_parser,
         'final_table':final_table_data,
     }
-    print(pl_parser.extracted_data)
     
     required_keys = list(data.keys())
     if not all(key in data for key in required_keys):
