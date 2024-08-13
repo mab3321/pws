@@ -919,6 +919,8 @@ def process_multi_po(driver, po_obj: MultiPOParse):
     po_tables = po_obj.extracted_data.get('po_tables')
     invoice_nos = po_tables.keys()
     print(invoice_nos)
+    processed_hs_codes = set()
+
     for invoice in invoice_nos:
         items_data = po_tables[invoice].get('po_numbers')
         print(items_data)
@@ -934,26 +936,29 @@ def process_multi_po(driver, po_obj: MultiPOParse):
             data_to_send['Quantity'] = data_to_send['PCS']
             data_to_send['PO Net Amount'] = data_to_send['PO_Amount']
             print(data_to_send)
-            if not data_to_send.get('hs_code'):
-                continue
-            else:
-                if idx == 0:
-                    add_item(driver, 1, data=data_to_send,item_no=True)
-                else:
-                    add_item(driver, 1, data=data_to_send)
 
+            hs_code = data_to_send.get('hs_code')
+
+            if not hs_code:
+                continue
+
+            if idx == 0:
+                add_item(driver, 1, data=data_to_send, item_no=True)
+            else:
+                add_item(driver, 1, data=data_to_send)
+
+            if hs_code not in processed_hs_codes:
                 if idx == 0:
-                    Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=data_to_send.get('hs_code'),
-                                       elem_index=idx + 1)
-                    print(f"Adding HS Code Wise Tables for hs code {data_to_send.get('hs_code')}")
-                    Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'),
-                                                hs_code=data_to_send.get('hs_code'), elem_index=idx + 1)
-                    print(f"GD Completed For Item : {item_data}")
-                else:
-                    Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'),
-                                                hs_code=data_to_send.get('hs_code'), elem_index=idx + 1)
+                    Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                    print(f"Adding HS Code Wise Tables for hs code {hs_code}")
+                Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                print(f"GD Completed For Item: {item_data}")
+                processed_hs_codes.add(hs_code)
+            else:
+                print(f"HS code {hs_code} is duplicate, skipping Non_Duty_Paid_Info.")
 
     return idx
+
 def main(data):
     try:
         print('Starting the process')
