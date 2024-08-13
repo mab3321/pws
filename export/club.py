@@ -932,6 +932,7 @@ def process_multi_po(driver, po_obj: MultiPOParse):
             data_to_send.update(totals)
             data_to_send['Carton'] = data_to_send['CTNS']
             data_to_send['Quantity'] = data_to_send['PCS']
+            data_to_send['PO Net Amount'] = data_to_send['PO_Amount']
             print(data_to_send)
             if not data_to_send.get('hs_code'):
                 continue
@@ -1029,6 +1030,7 @@ if __name__ == "__main__":
     if fty_po_pdf_path:
         pl_parser = PlParse(pl_po_pdf_path)
         po_parser = MultiPOParse(path=fty_po_pdf_path,csv_path=csv_po_path,des_path=desc_po_path)
+        print(po_parser)
         pdf_paths = [fty_po_pdf_path, pl_po_pdf_path]
     if fty_pdf_path and fty_po_pdf_path:
         final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'],fty_parser.extracted_data['final_table'])

@@ -158,8 +158,8 @@ class MultiPOParse:
         """
         for item in self.po_data:
             if po_number in item:
-                
-                return {'CTNS': item[po_number]['CTNS'],'PCS':item[po_number]['PCS'], 'description': item[po_number]['Desc'], 'hs_code':find_hs_code(item[po_number]['Desc'])}
+                print(f"Item is {item[po_number]}")
+                return {'CTNS': item[po_number]['CTNS'],'PCS':item[po_number]['PCS'],'PO_Amount':item[po_number]['PO_Amount'] ,'description': item[po_number]['Desc'], 'hs_code':find_hs_code(item[po_number]['Desc'])}
         return None
     def extract_details(self):
         final_table_list = []
@@ -225,7 +225,8 @@ class MultiPOParse:
             details = {
                 'PCS': row['PCS'],
                 'CTNS': row['CTNS'],
-                'Desc': row['Desc']
+                'Desc': row['Desc'],
+                'PO_Amount': row['VALUE']
             }
             data_list.append({po_number: details})
         
