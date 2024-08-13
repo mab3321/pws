@@ -1031,18 +1031,24 @@ if __name__ == "__main__":
     if fty_pdf_path:
         fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
         pl_parser = PlParse(pl_pdf_path)
-        pdf_paths = [pl_pdf_path, fty_pdf_path]
+        
     if fty_po_pdf_path:
         pl_parser = PlParse(pl_po_pdf_path)
         po_parser = MultiPOParse(path=fty_po_pdf_path,csv_path=csv_po_path,des_path=desc_po_path)
         print(po_parser)
-        pdf_paths = [fty_po_pdf_path, pl_po_pdf_path]
+        
     if fty_pdf_path and fty_po_pdf_path:
         final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'],fty_parser.extracted_data['final_table'])
+        fty_merge_path = merge_pdfs(fty_po_pdf_path,fty_pdf_path)
+        pl_merge_path = merge_pdfs(pl_po_pdf_path,pl_pdf_path)
+        pdf_paths = [fty_merge_path, pl_merge_path]
+        print(pdf_paths)
     elif fty_pdf_path:
         final_table_data = fty_parser.extracted_data['final_table']
+        pdf_paths = [pl_pdf_path, fty_pdf_path]
     else:
         final_table_data = po_parser.extracted_data['final_table']
+        pdf_paths = [fty_po_pdf_path, pl_po_pdf_path]
     print(final_table_data)
     
     data = {

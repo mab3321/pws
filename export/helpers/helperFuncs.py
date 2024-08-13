@@ -1,5 +1,5 @@
 import os,time
-
+from PyPDF2 import PdfMerger
 import pdfplumber
 import re
 from fuzzywuzzy import process
@@ -230,6 +230,46 @@ def extract_files_club_po():
     else:
         print("Error: Could not find all required files.")
         return None, None, None, None
+def merge_pdfs(pdf_path1, pdf_path2, output_dir=None):
+    merger = PdfMerger()
+
+    # Append the PDFs to be merged
+    merger.append(pdf_path1)
+    merger.append(pdf_path2)
+
+    # Set the output directory to 'uploads_merged'
+    if output_dir is None:
+        output_dir = os.path.join(os.path.dirname(pdf_path1), 'uploads_merged')
+    
+    # Ensure the 'uploads_merged' directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Empty the 'uploads_merged' directory if it exists
+    for filename in os.listdir(output_dir):
+        file_path = os.path.join(output_dir, filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as e:
+            print(f'Failed to delete {file_path}. Reason: {e}')
+
+    # Extract the base name of the first PDF file (without extension)
+    base_name = os.path.splitext(os.path.basename(pdf_path1))[0]
+    
+    # Define the output file name and full path
+    output_filename = f"{base_name}merged.pdf"
+    output_path = os.path.join(output_dir, output_filename)
+
+    # Write the merged PDF to the output path
+    with open(output_path, "wb") as output_pdf:
+        merger.write(output_pdf)
+
+    merger.close()
+
+    return output_path
+
 def add_data_dictionaries(dict1, dict2):
     """
     Adds values from two dictionaries containing numerical data.

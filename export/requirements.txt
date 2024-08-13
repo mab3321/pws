@@ -8,3 +8,4 @@ numpy~=1.26.1
 webdriver-manager~=3.8.6
 chromedriver-py
 flask~=3.0.3
+PyPDF2~=3.0.1
