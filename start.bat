@@ -1,5 +1,5 @@
 @echo off
-:: This script starts in the current directory, changes to 'export', activates the virtual environment, and runs app.py
+:: This script starts in the current directory, changes to 'export', clears the 'multi' folder, activates the virtual environment, and runs app.py
 
 :: Ensure the script starts in the current directory (the directory where this batch file is located)
 cd /d %~dp0
@@ -10,6 +10,20 @@ cd export || (
     echo Failed to change directory to 'export'
     pause
     exit /b 1
+)
+
+:: Remove the contents of the 'multi' folder
+echo Clearing the 'multi' folder
+if exist multi (
+    echo Deleting all files in 'multi' folder
+    del /f /s /q multi\*.* >nul 2>&1
+
+    echo Removing subdirectories in 'multi' folder
+    for /d %%x in (multi\*) do rd /s /q "%%x" >nul 2>&1
+
+    echo 'multi' folder contents cleared
+) else (
+    echo 'multi' folder does not exist, skipping deletion
 )
 
 :: Activate the virtual environment

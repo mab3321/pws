@@ -53,9 +53,9 @@ def start_selenium_job(single_files=None,single_folder_path=None,po_files=None,p
                 'UserName': 'CA-01-2688539',
                 'Password': 'Express@5599',
                 'pdf_paths': pdf_paths,
-                'pl_data': pl_parser.extracted_data,
-                'fty_data': fty_parser.extracted_data,
-                'po_obj': po_parser,
+                'pl_data': pl_parser.extracted_data if pl_parser else None,
+                'fty_data': fty_parser.extracted_data if fty_parser else None,
+                'po_obj': po_parser if po_parser else None,
                 'final_table': final_table_data,
             }
 
@@ -169,4 +169,4 @@ def upload_files():
 
     return render_template('upload.html')
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)
