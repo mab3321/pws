@@ -168,6 +168,7 @@ def extract_files_club_single(single_path=None):
         return None, None, None
 
 def process_duty_drawback(driver,description):
+    description = description.lower().strip().replace('\n', '')
     table = WebDriverWait(driver, 100).until(
             EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnldutydrawback"))
         )
@@ -178,13 +179,13 @@ def process_duty_drawback(driver,description):
     # Iterate through the rows, skipping the header
     for row in rows[2:]:
         cells = row.find_elements(By.TAG_NAME, "td")
-        if 'dye' in description.lower() and 'dyed or printed' in cells[1].text.lower():
+        if 'dye' in description and 'dyed or printed' in cells[1].text.lower():
             cells[0].click()
             return True
-        elif 'white' in description.lower() and 'shirt' in description.lower() and 'bleached blended' in cells[1].text.lower():
+        elif 'white' in description and ('t-shirt' in description or 't shirt' in description) and 'bleached blended' in cells[1].text.lower():
             cells[0].click()
             return True
-        elif '100' in description.lower() and 'polyester' in description.lower() and 'grey blended' in cells[1].text.lower():
+        elif '100' in description and 'polyester' in description and 'grey blended' in cells[1].text.lower():
             cells[2].click()
             return True
     else:
