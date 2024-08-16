@@ -919,13 +919,13 @@ def process_multi_po(driver, po_obj: MultiPOParse):
     po_tables = po_obj.extracted_data.get('po_tables')
     invoice_nos = po_tables.keys()
     print(invoice_nos)
-    processed_hs_codes = set()
 
     for invoice in invoice_nos:
+        processed_hs_codes = set()
         items_data = po_tables[invoice].get('po_numbers')
         print(items_data)
         for idx, item_data in enumerate(items_data):
-
+            
             data_to_send = po_obj.get_item_info(int(item_data))
             totals = po_tables[invoice].get('totals')
             csv_obj = po_tables[invoice].get('csv_obj')

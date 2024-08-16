@@ -18,18 +18,12 @@
         {% endwith %}
         <form method="post" enctype="multipart/form-data">
             <div class="mb-3">
-                <label for="multi_files" class="form-label">Multi Files (allowed: .xlsx, .pdf, .csv):</label>
-                <input type="file" name="multi_files[]" multiple class="form-control">
-                <div class="form-text">
-                    Multi files must include "fty", "pl", or "des" in their names.
-                </div>
+                <label for="po_files" class="form-label">Select PO Files (will be saved to 'po' folder):</label>
+                <input type="file" name="po_files[]" multiple class="form-control">
             </div>
             <div class="mb-3">
-                <label for="single_files" class="form-label">Single Files (allowed: .pdf, .csv):</label>
+                <label for="single_files" class="form-label">Select Single Files (will be saved to 'single' folder):</label>
                 <input type="file" name="single_files[]" multiple class="form-control">
-                <div class="form-text">
-                    Single files must include "pl" or "fty" in their names.
-                </div>
             </div>
             <button type="submit" class="btn btn-primary">Upload</button>
         </form>
