@@ -7,7 +7,7 @@ cd export
 
 :: Create a virtual environment named 'venv'
 echo Creating virtual environment
-python -m venv venv
+py -3.9 -m venv .venv
 
 :: Activate the virtual environment
 echo Activating virtual environment

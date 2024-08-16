@@ -457,7 +457,7 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
     except :
         Quantity = 0.0
     try:
-        CONSUMED = float(data.get('NOW CONSUMED'))
+        CONSUMED = float(data.get('Now Consume'))
     except :
         CONSUMED = 0.0
     if CONSUMED < Quantity:
@@ -1018,7 +1018,7 @@ if __name__ == "__main__":
     parser.add_argument('--user_id', type=int, default=123, help='Transaction ID')
     parser.add_argument('--URL', type=str, default='https://app.psw.gov.pk/app/', help='URL')
     parser.add_argument('--UserName', type=str, default='CA-01-2688539', help='Username')
-    parser.add_argument('--Password', type=str, default='Express@3833', help='Password')
+    parser.add_argument('--Password', type=str, default='Express@5599', help='Password')
     parser.add_argument('--player_username', type=str, default='hassanlahore', help='Player username')
     parser.add_argument('--player_nickname', type=str, default='hassanlahore', help='Player nickname')
     parser.add_argument('--player_password', type=str, default='12345', help='Player password')

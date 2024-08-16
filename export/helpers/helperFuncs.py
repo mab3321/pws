@@ -125,9 +125,12 @@ def extract_files():
         print("Error: Could not find all required files.")
         return None, None, None
 
-def extract_files_club_single():
-    current_dir = os.getcwd()
-    uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multisingle'))
+def extract_files_club_single(single_path=None):
+    if not single_path:
+        current_dir = os.getcwd()
+        uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multisingle'))
+    else:
+        uploads_dir = os.path.abspath(single_path)
     # Check if the directory is empty
     if not os.listdir(uploads_dir):
         print("Directory is empty.")
@@ -190,9 +193,12 @@ def process_duty_drawback(driver,description):
         cells[0].click()
         return True
 
-def extract_files_club_po():
-    current_dir = os.getcwd()
-    uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multipos'))
+def extract_files_club_po(po_path=None):
+    if not po_path:
+        current_dir = os.getcwd()
+        uploads_dir = os.path.abspath(os.path.join(current_dir, os.pardir, 'multi','multipos'))
+    else:
+        uploads_dir = os.path.abspath(po_path)  
     # Check if the directory is empty
     if not os.listdir(uploads_dir):
         print("Directory is empty.")
@@ -230,6 +236,7 @@ def extract_files_club_po():
     else:
         print("Error: Could not find all required files.")
         return None, None, None, None
+
 def merge_pdfs(pdf_path1, pdf_path2, output_dir=None):
     merger = PdfMerger()
 
