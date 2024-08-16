@@ -28,11 +28,11 @@ def start_selenium_job(single_files=None,single_folder_path=None,po_files=None,p
             if fty_pdf_path:
                 fty_parser = MultiSingleParse(fty_pdf_path, csv_path=csv_path)
                 pl_parser = PlParse(pl_pdf_path)
-
+            
             if fty_po_pdf_path:
                 pl_parser = PlParse(pl_po_pdf_path)
                 po_parser = MultiPOParse(path=fty_po_pdf_path, csv_path=csv_po_path, des_path=desc_po_path)
-
+            
             if fty_pdf_path and fty_po_pdf_path:
                 final_table_data = add_data_dictionaries(po_parser.extracted_data['final_table'], fty_parser.extracted_data['final_table'])
                 fty_merge_path = merge_pdfs(fty_po_pdf_path, fty_pdf_path)
@@ -44,7 +44,7 @@ def start_selenium_job(single_files=None,single_folder_path=None,po_files=None,p
             else:
                 final_table_data = po_parser.extracted_data['final_table']
                 pdf_paths = [fty_po_pdf_path, pl_po_pdf_path]
-
+            print(final_table_data)
             # Prepare data for the Selenium job
             data = {
                 'transaction_id': 123,
@@ -58,7 +58,7 @@ def start_selenium_job(single_files=None,single_folder_path=None,po_files=None,p
                 'po_obj': po_parser if po_parser else None,
                 'final_table': final_table_data,
             }
-
+            print(final_table_data)
             required_keys = list(data.keys())
             if not all(key in data for key in required_keys):
                 print("Missing required keys in data dictionary")
@@ -169,4 +169,4 @@ def upload_files():
 
     return render_template('upload.html')
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=True)

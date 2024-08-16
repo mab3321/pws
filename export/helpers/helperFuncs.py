@@ -303,7 +303,9 @@ def add_data_dictionaries(dict1, dict2):
     # Join the grouped invoices with newline characters
     formatted_output = '\n'.join(formatted_invoices)
     result['invoices'] = formatted_output
+    result['date'] = dict1.get('date', dict2.get('date'))
     return result
+
 def toggle_NonDutyPaid(driver : webdriver.Chrome, ):
     image_element = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_NonDutyPaidItemInfoUc1_Image1"))

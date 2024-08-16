@@ -9,6 +9,7 @@ class MultiSingleParse:
         self.csv_path = csv_path
         self.pdf = None
         self.text = ''
+        self.date = None
         self.extracted_data = {}
         self.invoice_number = None
         self.log_no = None
@@ -69,6 +70,7 @@ class MultiSingleParse:
             raise Exception("'Notes' or 'Tax Sentence' not found in the text")
     def summarize_data(self, data):
         final_table = {
+            'date':self.date,
             'Quantity': 0.0,
             'Carton': 0.0,
             'Gross Weight': 0.0,
@@ -120,6 +122,8 @@ class MultiSingleParse:
             totals_dict['log_no'] = log_no
             totals_dict['document_date'] = document_date
             totals_dict['invoice_date'] = invoice_date
+            if not self.date:
+                self.date = invoice_date
             combined_totals.append(totals_dict)  # Update the combined dictionary with the current page's dictionary
         self.extracted_data['extracted_data'] = combined_totals
         # Print the combined dictionary with data from the last two pages
@@ -142,6 +146,7 @@ class MultiPOParse:
         self.des_path = des_path
         self.pdf_path = path
         self.csv_path = csv_path
+        self.date = None
         self.extracted_data = {}
         self.po_data = []
         self.extract_details()
@@ -174,6 +179,7 @@ class MultiPOParse:
         self.extracted_data['final_table'] = self.summarize_data(final_table_list)
     def summarize_data(self, data):
         final_table = {
+            'date':self.date,
             'Quantity': 0.0,
             'Carton': 0.0,
             'Gross Weight': 0.0,
@@ -332,6 +338,8 @@ class MultiPOParse:
             for page in pdf.pages:
                 # Extract invoice data from the top box
                 invoice_number, log_no, document_date, invoice_date = self.data_from_top_box(page)
+                if not self.date:
+                    self.date = invoice_date
                 if not invoice_number:
                     invoice_number = previous_invoice_number
                 
@@ -353,7 +361,7 @@ class MultiPOParse:
                     totals['invoice_number'] = previous_invoice_number
                     data_per_invoice[previous_invoice_number] = {
                         'po_numbers': current_po_numbers,
-                        'totals': totals
+                        'totals': totals,
                     }
                     current_po_numbers = []
                     previous_pages = [previous_pages[len(previous_pages)-1]]

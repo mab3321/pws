@@ -189,7 +189,7 @@ def fill_form(driver: webdriver.Chrome, transaction_id, data={}):
                    bl_awb_no)
         #  SET the BL/AWB Date (Invoice Date)
         # Parse the date string into a datetime object
-        date_object = datetime.strptime(fty_data.get("extracted_data")[0].get('invoice_date'), "%Y-%m-%d")
+        date_object = datetime.strptime(data.get("final_table").get('date'), "%Y-%m-%d")
         write_date(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtBlDate_txtDate", date_object.strftime("%d/%m/%Y"))
         #  Select the Port of Shipment dropdown
         select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlPortOfShipment",
