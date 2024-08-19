@@ -625,7 +625,7 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
     driver.switch_to.frame(iframe)
     time.sleep(2)
     wait_for_page_load(driver)
-
+    return True
 
 def add_excel_data_492(driver: webdriver.Chrome, data):
     # Wait until the image is present
@@ -637,9 +637,14 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
         pop_up_492 = process_gd_number_pop_up_492(driver, data)
         if pop_up_492:
             click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
-
+            table = WebDriverWait(driver, 100).until(
+                        EC.presence_of_element_located((By.ID, "tblAlert"))
+                    )
+            error_text = table.text.lower().strip()
+            if error_text:
+                raise Exception(f"Got Error for {data.get('B/E No')}")
             WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
             )
             print(f"Element in pop up Added.")
         else:
@@ -654,7 +659,6 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
             EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
         )
 
-
 def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscode_wise=False):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
@@ -666,17 +670,22 @@ def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscod
     try:
         hs_code = process_gd_number_pop_up_957(driver, data, is_hscode_wise)
         if hs_code:
-            process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
-            click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
-
-            WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
-            )
-            print(f"Element in pop up Added.")
+            res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
+            if res_process_analysis_number_pop_up_957:
+                click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
+                table = WebDriverWait(driver, 100).until(
+                        EC.presence_of_element_located((By.ID, "tblAlert"))
+                    )
+                error_text = table.text.lower().strip()
+                if error_text:
+                    print(f"Got Error for {data.get(be_no)}")
+                    raise Exception(f"Got Error for {data.get(be_no)}")
+                print(f"Element in pop up Processed.")
+            else:
+                raise Exception(f"Analysis Number Not Found for {data.get(be_no)}")
+                
         else:
-            print(f"HS Code Not Found for {data.get(be_no)}")
-            # Cancel the present filling
-            click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnCancelBottom")
+            raise Exception(f"HS Code Not Found for {data.get(be_no)}")
     except Exception as e:
         print(f"Got Error for {data.get(be_no)} => {str(e)}")
         # Cancel the present filling

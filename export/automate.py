@@ -448,7 +448,6 @@ def process_492(driver,data):
             add_excel_data_492(driver,data=obj)
 def process_957(driver,data,analysis_number):
     for obj in data:
-        categorize_invoice('KPPE-PF-197684')
         if categorize_invoice(obj.get('B/E No/PACKAGE NO/PURCHASE INV#')) == 'non_local':
             add_excel_data_957(driver,data=obj,analysis_number=analysis_number)
         else:

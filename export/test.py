@@ -189,7 +189,7 @@ def fill_form(driver: webdriver.Chrome, transaction_id, data={}):
                    bl_awb_no)
         #  SET the BL/AWB Date (Invoice Date)
         # Parse the date string into a datetime object
-        date_object = datetime.strptime(fty_data.get("extracted_data")[0].get('invoice_date'), "%Y-%m-%d")
+        date_object = datetime.strptime(data.get("final_table").get('date'), "%Y-%m-%d")
         write_date(driver, "ctl00_ContentPlaceHolder2_GdInfoSeaUc_txtBlDate_txtDate", date_object.strftime("%d/%m/%Y"))
         #  Select the Port of Shipment dropdown
         select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlPortOfShipment",
@@ -457,7 +457,7 @@ def process_gd_number_pop_up_492(driver : webdriver.Chrome,data):
     except :
         Quantity = 0.0
     try:
-        CONSUMED = float(data.get('NOW CONSUMED'))
+        CONSUMED = float(data.get('Now Consume'))
     except :
         CONSUMED = 0.0
     if CONSUMED < Quantity:
@@ -625,7 +625,7 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
     driver.switch_to.frame(iframe)
     time.sleep(2)
     wait_for_page_load(driver)
-
+    return True
 
 def add_excel_data_492(driver: webdriver.Chrome, data):
     # Wait until the image is present
@@ -637,9 +637,14 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
         pop_up_492 = process_gd_number_pop_up_492(driver, data)
         if pop_up_492:
             click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
-
+            table = WebDriverWait(driver, 100).until(
+                        EC.presence_of_element_located((By.ID, "tblAlert"))
+                    )
+            error_text = table.text.lower().strip()
+            if error_text:
+                raise Exception(f"Got Error for {data.get('B/E No')}")
             WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_btnSaveTop"))
+                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
             )
             print(f"Element in pop up Added.")
         else:
@@ -654,7 +659,6 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
             EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
         )
 
-
 def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscode_wise=False):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
@@ -666,17 +670,22 @@ def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscod
     try:
         hs_code = process_gd_number_pop_up_957(driver, data, is_hscode_wise)
         if hs_code:
-            process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
-            click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
-
-            WebDriverWait(driver, 100).until(
-                EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
-            )
-            print(f"Element in pop up Added.")
+            res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
+            if res_process_analysis_number_pop_up_957:
+                click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
+                table = WebDriverWait(driver, 100).until(
+                        EC.presence_of_element_located((By.ID, "tblAlert"))
+                    )
+                error_text = table.text.lower().strip()
+                if error_text:
+                    print(f"Got Error for {data.get(be_no)}")
+                    raise Exception(f"Got Error for {data.get(be_no)}")
+                print(f"Element in pop up Processed.")
+            else:
+                raise Exception(f"Analysis Number Not Found for {data.get(be_no)}")
+                
         else:
-            print(f"HS Code Not Found for {data.get(be_no)}")
-            # Cancel the present filling
-            click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnCancelBottom")
+            raise Exception(f"HS Code Not Found for {data.get(be_no)}")
     except Exception as e:
         print(f"Got Error for {data.get(be_no)} => {str(e)}")
         # Cancel the present filling
@@ -919,11 +928,13 @@ def process_multi_po(driver, po_obj: MultiPOParse):
     po_tables = po_obj.extracted_data.get('po_tables')
     invoice_nos = po_tables.keys()
     print(invoice_nos)
+
     for invoice in invoice_nos:
+        processed_hs_codes = set()
         items_data = po_tables[invoice].get('po_numbers')
         print(items_data)
         for idx, item_data in enumerate(items_data):
-
+            
             data_to_send = po_obj.get_item_info(int(item_data))
             totals = po_tables[invoice].get('totals')
             csv_obj = po_tables[invoice].get('csv_obj')
@@ -932,27 +943,31 @@ def process_multi_po(driver, po_obj: MultiPOParse):
             data_to_send.update(totals)
             data_to_send['Carton'] = data_to_send['CTNS']
             data_to_send['Quantity'] = data_to_send['PCS']
+            data_to_send['PO Net Amount'] = data_to_send['PO_Amount']
             print(data_to_send)
-            if not data_to_send.get('hs_code'):
-                continue
-            else:
-                if idx == 0:
-                    add_item(driver, 1, data=data_to_send,item_no=True)
-                else:
-                    add_item(driver, 1, data=data_to_send)
 
+            hs_code = data_to_send.get('hs_code')
+
+            if not hs_code:
+                continue
+
+            if idx == 0:
+                add_item(driver, 1, data=data_to_send, item_no=True)
+            else:
+                add_item(driver, 1, data=data_to_send)
+
+            if hs_code not in processed_hs_codes:
                 if idx == 0:
-                    Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=data_to_send.get('hs_code'),
-                                       elem_index=idx + 1)
-                    print(f"Adding HS Code Wise Tables for hs code {data_to_send.get('hs_code')}")
-                    Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'),
-                                                hs_code=data_to_send.get('hs_code'), elem_index=idx + 1)
-                    print(f"GD Completed For Item : {item_data}")
-                else:
-                    Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'),
-                                                hs_code=data_to_send.get('hs_code'), elem_index=idx + 1)
+                    Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                    print(f"Adding HS Code Wise Tables for hs code {hs_code}")
+                Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                print(f"GD Completed For Item: {item_data}")
+                processed_hs_codes.add(hs_code)
+            else:
+                print(f"HS code {hs_code} is duplicate, skipping Non_Duty_Paid_Info.")
 
     return idx
+
 def main(data):
     try:
         print('Starting the process')
@@ -1017,7 +1032,7 @@ data = {
     'user_id': 2,
     'URL': 'https://app.psw.gov.pk/app/',
     'UserName': 'CA-01-2688539',
-    'Password': 'Express@3833',
+    'Password': 'Express@5599',
     'pdf_paths': pdf_paths,
     'pl_data':pl_parser.extracted_data,
     'fty_data':fty_parser.extracted_data,
