@@ -17,7 +17,7 @@ from datetime import datetime
 from selenium.webdriver.chrome.service import Service as ChromeService
 from chromedriver_py import binary_path
 
-
+summaries = []
 def setup_driver():
     svc = webdriver.ChromeService(executable_path=binary_path)
     chrome_options = webdriver.ChromeOptions()
@@ -661,6 +661,7 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
 
 def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscode_wise=False):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
+    hs_code = None
     if is_hscode_wise:
         be_no = 'B/E No'
     toggle_NonDutyPaid(driver)
@@ -687,6 +688,14 @@ def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscod
         else:
             raise Exception(f"HS Code Not Found for {data.get(be_no)}")
     except Exception as e:
+        error_message = str(e).replace('\n', ' ')
+        truncated_error = ' '.join(error_message.split()[:100])
+        local_summary = {
+            'B/E No': data.get(be_no),
+            'HS Code': hs_code,
+            'Error': truncated_error
+        }
+        summaries.append(local_summary)
         print(f"Got Error for {data.get(be_no)} => {str(e)}")
         # Cancel the present filling
         click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnCancelBottom")
@@ -1017,6 +1026,10 @@ def main(data):
         finalStatus = False
         finalMessage = str(e)
     finally:
+        for summary in summaries:
+            print(f"{BLUE}B/E No: {summary['B/E No']}{RESET}")
+            print(f"{GREEN}HS Code: {summary['HS Code']}{RESET}")
+            print(f"{RED}Error: {summary['Error']}{RESET}\n")
         driver.quit()
         return finalStatus, finalMessage
     
