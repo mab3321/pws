@@ -18,6 +18,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from chromedriver_py import binary_path
 
 summaries = []
+
 def setup_driver():
     svc = webdriver.ChromeService(executable_path=binary_path)
     chrome_options = webdriver.ChromeOptions()
@@ -926,6 +927,9 @@ def Non_Duty_Paid_Info_multi_po(driver, csv_obj: CSVDataExtractor, hs_code, elem
 
 def process_multi_single(driver, items_data, prev_idx=0):
     for idx, item_data in enumerate(items_data):
+        if not item_data.get('hs_code'):
+            print(f"HS Code not found for item {item_data}")
+            continue
         item_no=True if idx == 0 else None
         hs_code = add_item(driver, 1, data=item_data, item_no=item_no)
         Non_Duty_Paid_Info(driver, item_data.get('csv_obj'), hs_code, elem_index=idx + 1 + prev_idx)
@@ -1020,16 +1024,15 @@ def main(data):
                     process_multi_single(driver,items_data,prev_idx)
         else:
             finalMessage = login_form_error
-
     except Exception as e:
         print(f"For transaction_id { transaction_id } Exception occurred: {e}")
         finalStatus = False
         finalMessage = str(e)
     finally:
         for summary in summaries:
-            print(f"{BLUE}B/E No: {summary['B/E No']}{RESET}")
-            print(f"{GREEN}HS Code: {summary['HS Code']}{RESET}")
-            print(f"{RED}Error: {summary['Error']}{RESET}\n")
+            print(f"{BLUE}B/E No: {summary.get('B/E No')}{RESET}")
+            print(f"{GREEN}HS Code: {summary.get('HS Code')}{RESET}")
+            print(f"{RED}Error: {summary.get('Error')}{RESET}\n")
         driver.quit()
         return finalStatus, finalMessage
     
