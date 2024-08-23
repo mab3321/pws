@@ -22,8 +22,27 @@ hs_codes = {
     "Men 100% Pullovers": "6110.2000",
     "Women 100% Pullovers": "6110.2000",
     "Men 80/20% Pullovers": "6110.9000",
-    "Women 80/20% Pullovers": "6110.9000"
+    "Women 80/20% Pullovers": "6110.9000",
+
+    # New codes from the image
+    "Women 80/20% Suits": "6104.2900",
+    "Men 100% Crocheted": "6105.1000",
+    "Men 80/20% Crocheted": "6105.9000",
+    "Men 100% Crocheted": "6105.2000",
+    "Men 100% PES Shirts": "6105.2000",
+    "Women 100% Skirts": "6104.5200",
+    "Women 80/20% Skirts": "6104.5900",
+    "Men 100% Polyester Suits": "6103.2300",
+    "Men 100% Polyester Jackets": "6103.3300",
+    "Men 100% Polyester Pants": "6103.4300",
+    "Women 100% Polyester Suits": "6104.2300",
+    "Women 100% Polyester Jackets": "6104.3300",
+    "Women 100% Polyester Skirts": "6104.5300",
+    "Women 100% Polyester Pants": "6104.6300",
+    "Men 100% Polyester Pullovers": "6110.3000",
+    "Women 100% Polyester Pullovers": "6110.3000"
 }
+
 cities = {
     'COLOMBIA': 'BUENAVENTURA',
     'BRAZIL': 'SANTOS',

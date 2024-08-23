@@ -55,9 +55,23 @@ def find_hs_code(description):
 
     garment_type = None
     gender_category = None
-
-    if 't-shirt' in description or 't shirt' in description:
+    if ('polyester' in description) and ('100' in description):
+        if 'suit' in description:
+            garment_type = 'Polyester Suits'
+        elif 'jacket' in description:
+            garment_type = 'Polyester Jackets'
+        elif 'pant' in description:
+            garment_type = 'Polyester Pants'
+        elif 'skirt' in description:
+            garment_type = 'Polyester Skirts'
+        elif 'pullover' in description:
+            garment_type = 'Polyester Pullovers'
+    elif 'crocheted' in description:
+        garment_type = 'Crocheted'
+    elif 't-shirt' in description or 't shirt' in description:
         garment_type = 'T-Shirts'
+    elif 'pes shirt' in description:
+        garment_type = 'PES Shirts'
     elif 'shirt' in description:
         garment_type = 'Shirts'
     elif 'pant' in description or 'shorts' in description:
@@ -66,6 +80,8 @@ def find_hs_code(description):
         garment_type = 'Jackets'
     elif 'track suit' in description:
         garment_type = 'Track Suits'
+    elif 'suit' in description:
+        garment_type = 'Suits'
     elif 'pullover' in description:
         garment_type = 'Pullovers'
 
