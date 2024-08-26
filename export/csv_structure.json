@@ -1,0 +1,702 @@
+{
+    "file_path": "C:\\Users\\DELL\\Downloads\\PWSAutomate\\multi\\multipos\\EFS508645.csv",
+    "table1_data": [
+        {
+            "HS CODE:": "6109.9090",
+            "DESCRIPTION:": "M/W 80%-20% T-SHIRTS",
+            "CTN PCS": "401",
+            "POLSTER PCS": "401",
+            "WHITE": NaN,
+            "TOTAL PCS": "401",
+            "N N WEIGHT:": "115.3903708",
+            "ANALYSIS NO:": "LEXP-0657810-870-19-01-2024"
+        },
+        {
+            "HS CODE:": "6109.1000",
+            "DESCRIPTION:": "M/W 100% T-SHIRTS",
+            "CTN PCS": "2672",
+            "POLSTER PCS": NaN,
+            "WHITE": "774",
+            "TOTAL PCS": "3446",
+            "N N WEIGHT:": "991.6090221",
+            "ANALYSIS NO:": "LEXP-0657810-871-19-01-2024"
+        },
+        {
+            "HS CODE:": "6103.4200",
+            "DESCRIPTION:": "MEN PANT 100%",
+            "CTN PCS": "32",
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "32",
+            "N N WEIGHT:": "9.208209143",
+            "ANALYSIS NO:": "LEXP-0657810-872-22-01-2024"
+        },
+        {
+            "HS CODE:": "6103.4900",
+            "DESCRIPTION:": "MEN 80%-20% PANT",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-873-22-01-2024"
+        },
+        {
+            "HS CODE:": "6104.6200",
+            "DESCRIPTION:": "WOMEN 100% PANTS",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-874-22-01-2024"
+        },
+        {
+            "HS CODE:": "6104.6900",
+            "DESCRIPTION:": "WOMENS 80%-20% PANTS",
+            "CTN PCS": "840",
+            "POLSTER PCS": "840",
+            "WHITE": NaN,
+            "TOTAL PCS": "840",
+            "N N WEIGHT:": "241.71549",
+            "ANALYSIS NO:": "LEXP-0657810-875-22-01-2024"
+        },
+        {
+            "HS CODE:": "6103.3200",
+            "DESCRIPTION:": "MENS 100% JACKETS",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-876-22-01-2024"
+        },
+        {
+            "HS CODE:": "6103.3900",
+            "DESCRIPTION:": "MENS 80%-20 JACKETS",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-877-22-01-2024"
+        },
+        {
+            "HS CODE:": "6104.3200",
+            "DESCRIPTION:": "WOMENS 100% JACKETS",
+            "CTN PCS": "422",
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "422",
+            "N N WEIGHT:": "121.4332581",
+            "ANALYSIS NO:": "LEXP-0657810-878-22-01-2024"
+        },
+        {
+            "HS CODE:": "6104.3900",
+            "DESCRIPTION:": "WOMENS 80%-20% JACKETS",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-879-22-01-2024"
+        },
+        {
+            "HS CODE:": "6110.2000",
+            "DESCRIPTION:": "M/W 100% PULLOVER",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-880-22-01-2024"
+        },
+        {
+            "HS CODE:": "6110.9000",
+            "DESCRIPTION:": "M/W 80%-20% PULLOVER",
+            "CTN PCS": "1706",
+            "POLSTER PCS": "1706",
+            "WHITE": NaN,
+            "TOTAL PCS": "1706",
+            "N N WEIGHT:": "490.9126499",
+            "ANALYSIS NO:": "LEXP-0657810-881-22-01-2024"
+        },
+        {
+            "HS CODE:": "6103.2200",
+            "DESCRIPTION:": "MENS 100% SUIT",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-882-22-01-2024"
+        },
+        {
+            "HS CODE:": "6103.2900",
+            "DESCRIPTION:": "MENS 80%-20 SUIT",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-883-22-01-2024"
+        },
+        {
+            "HS CODE:": "6104.2200",
+            "DESCRIPTION:": "WOMENS 100% SUIT",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-884-22-01-2024"
+        },
+        {
+            "HS CODE:": "6104.2900",
+            "DESCRIPTION:": "WOMENS 80%-20% SUIT",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-885-22-01-2024"
+        },
+        {
+            "HS CODE:": "6105.1000",
+            "DESCRIPTION:": "100% SHIRT OR CROCHETED",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-887-23-01-2024"
+        },
+        {
+            "HS CODE:": "6105.9000",
+            "DESCRIPTION:": "80% 20% SHIRT OR CROCHETED",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-886-23-01-2024"
+        },
+        {
+            "HS CODE:": "6104.5200",
+            "DESCRIPTION:": "100% SKIRTS",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-888-23-01-2024"
+        },
+        {
+            "HS CODE:": "6104.5900",
+            "DESCRIPTION:": "80%-20% SKIRTS",
+            "CTN PCS": NaN,
+            "POLSTER PCS": NaN,
+            "WHITE": NaN,
+            "TOTAL PCS": "0",
+            "N N WEIGHT:": "0",
+            "ANALYSIS NO:": "LEXP-0657810-889-23-01-2024"
+        }
+    ],
+    "table492_data": [
+        {
+            "B/E No": "LPFI-TI-35976",
+            "PER UNIT VALUE": 25.939,
+            "Now Consume": 14.7383
+        },
+        {
+            "B/E No": "LPFI-TI-10408",
+            "PER UNIT VALUE": 54.068,
+            "Now Consume": 2.6032
+        },
+        {
+            "B/E No": "LPAF-TI-5501",
+            "PER UNIT VALUE": 44.525,
+            "Now Consume": 6.2656
+        },
+        {
+            "B/E No": "LPAF-TI-12760",
+            "PER UNIT VALUE": 37.254,
+            "Now Consume": 14.3936
+        },
+        {
+            "B/E No": "PQZI-EP-23578",
+            "PER UNIT VALUE": 21.688,
+            "Now Consume": 7.2481
+        },
+        {
+            "B/E No": "LPFI-TI-32624",
+            "PER UNIT VALUE": 755.282,
+            "Now Consume": 0.8162
+        }
+    ],
+    "table957_data": [
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "KAPS-FS-31095",
+            "PER UNIT VALUE": 3.95,
+            "NOW CONSUMED": 142.1082
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "LPAF-FS-41827",
+            "PER UNIT VALUE": 25.5833,
+            "NOW CONSUMED": 15.9138
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "KAPW-FS-164203",
+            "PER UNIT VALUE": 0.46,
+            "NOW CONSUMED": 184.869
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "PQIB-FS-21256",
+            "PER UNIT VALUE": 0.1154,
+            "NOW CONSUMED": 10270.5
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "KAPS-FS-19777",
+            "PER UNIT VALUE": 15.8284,
+            "NOW CONSUMED": 23.2653
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "KPPE-PF-209549",
+            "PER UNIT VALUE": 47.1764,
+            "NOW CONSUMED": 0.411
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "07052024-A-094990",
+            "PER UNIT VALUE": 0.9298,
+            "NOW CONSUMED": 61.623
+        },
+        {
+            "B/E No/PACKAGE NO/PURCHASE INV#": "11062024-A-113214",
+            "PER UNIT VALUE": 1.4211,
+            "NOW CONSUMED": 513.525
+        }
+    ],
+    "hs_code_wise_tables": {
+        "6109.9090": {
+            "main_details": {
+                "HS CODE": "6109.9090",
+                "DESCRIPTION": "M/W 80%-20% T-SHIRTS",
+                "PIECES": "401",
+                "NET NET WEIGHT": "115.39",
+                "ANALYSIS NUMBER": "LEXP-0657810-870-19-01-2024"
+            },
+            "sub_table": [
+                {
+                    "NOW CONSUMED": "9.3834",
+                    "B/E No": "KAPS-FS-31095",
+                    "PER UNIT VALUE": "3.950"
+                },
+                {
+                    "NOW CONSUMED": "2.1654",
+                    "B/E No": "LPAF-FS-41827",
+                    "PER UNIT VALUE": "25.583"
+                },
+                {
+                    "NOW CONSUMED": "10.8270",
+                    "B/E No": "KAPW-FS-164203",
+                    "PER UNIT VALUE": "0.460"
+                },
+                {
+                    "NOW CONSUMED": "601.5000",
+                    "B/E No": "PQIB-FS-21256",
+                    "PER UNIT VALUE": "0.115"
+                },
+                {
+                    "NOW CONSUMED": "0.0241",
+                    "B/E No": "KPPE-PF-209549",
+                    "PER UNIT VALUE": "47.176"
+                },
+                {
+                    "NOW CONSUMED": "3.6090",
+                    "B/E No": "07052024-A-094990",
+                    "PER UNIT VALUE": "0.930"
+                },
+                {
+                    "NOW CONSUMED": "30.0750",
+                    "B/E No": "11062024-A-113214",
+                    "PER UNIT VALUE": "1.421"
+                }
+            ]
+        },
+        "6109.1000": {
+            "main_details": {
+                "HS CODE": "6109.1000",
+                "DESCRIPTION": "M/W 100% T-SHIRTS",
+                "PIECES": "3446",
+                "NET NET WEIGHT": "991.61",
+                "ANALYSIS NUMBER": "LEXP-0657810-871-19-01-2024"
+            },
+            "sub_table": [
+                {
+                    "NOW CONSUMED": "62.5248",
+                    "B/E No": "KAPS-FS-31095",
+                    "PER UNIT VALUE": "3.950"
+                },
+                {
+                    "NOW CONSUMED": "93.0420",
+                    "B/E No": "KAPW-FS-164203",
+                    "PER UNIT VALUE": "0.460"
+                },
+                {
+                    "NOW CONSUMED": "5169.0000",
+                    "B/E No": "PQIB-FS-21256",
+                    "PER UNIT VALUE": "0.115"
+                },
+                {
+                    "NOW CONSUMED": "0.2068",
+                    "B/E No": "KPPE-PF-209549",
+                    "PER UNIT VALUE": "47.176"
+                },
+                {
+                    "NOW CONSUMED": "31.0140",
+                    "B/E No": "07052024-A-094990",
+                    "PER UNIT VALUE": "0.930"
+                },
+                {
+                    "NOW CONSUMED": "258.4500",
+                    "B/E No": "11062024-A-113214",
+                    "PER UNIT VALUE": "1.421"
+                }
+            ]
+        },
+        "6103.4200": {
+            "main_details": {
+                "HS CODE": "6103.4200",
+                "DESCRIPTION": "MEN PANT 100%",
+                "PIECES": "32",
+                "NET NET WEIGHT": "9.21",
+                "ANALYSIS NUMBER": "LEXP-0657810-872-22-01-2024"
+            },
+            "sub_table": [
+                {
+                    "NOW CONSUMED": "0.7488",
+                    "B/E No": "KAPS-FS-31095",
+                    "PER UNIT VALUE": "3.950"
+                },
+                {
+                    "NOW CONSUMED": "0.8640",
+                    "B/E No": "KAPW-FS-164203",
+                    "PER UNIT VALUE": "0.460"
+                },
+                {
+                    "NOW CONSUMED": "48.0000",
+                    "B/E No": "PQIB-FS-21256",
+                    "PER UNIT VALUE": "0.115"
+                },
+                {
+                    "NOW CONSUMED": "0.2432",
+                    "B/E No": "KAPS-FS-19777",
+                    "PER UNIT VALUE": "15.828"
+                },
+                {
+                    "NOW CONSUMED": "0.0019",
+                    "B/E No": "KPPE-PF-209549",
+                    "PER UNIT VALUE": "47.176"
+                },
+                {
+                    "NOW CONSUMED": "0.2880",
+                    "B/E No": "07052024-A-094990",
+                    "PER UNIT VALUE": "0.930"
+                },
+                {
+                    "NOW CONSUMED": "2.4000",
+                    "B/E No": "11062024-A-113214",
+                    "PER UNIT VALUE": "1.421"
+                }
+            ]
+        },
+        "6103.4900": {
+            "main_details": {
+                "HS CODE": "6103.4900",
+                "DESCRIPTION": "MEN 80%-20% PANT",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-873-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.6200": {
+            "main_details": {
+                "HS CODE": "6104.6200",
+                "DESCRIPTION": "WOMEN 100% PANTS",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-874-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.6900": {
+            "main_details": {
+                "HS CODE": "6104.6900",
+                "DESCRIPTION": "WOMENS 80%-20% PANTS",
+                "PIECES": "840",
+                "NET NET WEIGHT": "241.72",
+                "ANALYSIS NUMBER": "LEXP-0657810-875-22-01-2024"
+            },
+            "sub_table": [
+                {
+                    "NOW CONSUMED": "19.6560",
+                    "B/E No": "KAPS-FS-31095",
+                    "PER UNIT VALUE": "3.950"
+                },
+                {
+                    "NOW CONSUMED": "4.5360",
+                    "B/E No": "LPAF-FS-41827",
+                    "PER UNIT VALUE": "25.583"
+                },
+                {
+                    "NOW CONSUMED": "22.6800",
+                    "B/E No": "KAPW-FS-164203",
+                    "PER UNIT VALUE": "0.460"
+                },
+                {
+                    "NOW CONSUMED": "1260.0000",
+                    "B/E No": "PQIB-FS-21256",
+                    "PER UNIT VALUE": "0.115"
+                },
+                {
+                    "NOW CONSUMED": "6.3840",
+                    "B/E No": "KAPS-FS-19777",
+                    "PER UNIT VALUE": "15.828"
+                },
+                {
+                    "NOW CONSUMED": "0.0504",
+                    "B/E No": "KPPE-PF-209549",
+                    "PER UNIT VALUE": "47.176"
+                },
+                {
+                    "NOW CONSUMED": "7.5600",
+                    "B/E No": "07052024-A-094990",
+                    "PER UNIT VALUE": "0.930"
+                },
+                {
+                    "NOW CONSUMED": "63.0000",
+                    "B/E No": "11062024-A-113214",
+                    "PER UNIT VALUE": "1.421"
+                }
+            ]
+        },
+        "6103.3200": {
+            "main_details": {
+                "HS CODE": "6103.3200",
+                "DESCRIPTION": "MENS 100% JACKETS",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-876-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6103.3900": {
+            "main_details": {
+                "HS CODE": "6103.3900",
+                "DESCRIPTION": "MENS 100% JACKETS",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-877-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.3200": {
+            "main_details": {
+                "HS CODE": "6104.3200",
+                "DESCRIPTION": "WOMENS 100% JACKETS",
+                "PIECES": "422",
+                "NET NET WEIGHT": "121.43",
+                "ANALYSIS NUMBER": "LEXP-0657810-878-22-01-2024"
+            },
+            "sub_table": [
+                {
+                    "NOW CONSUMED": "9.8748",
+                    "B/E No": "KAPS-FS-31095",
+                    "PER UNIT VALUE": "3.950"
+                },
+                {
+                    "NOW CONSUMED": "11.3940",
+                    "B/E No": "KAPW-FS-164203",
+                    "PER UNIT VALUE": "0.460"
+                },
+                {
+                    "NOW CONSUMED": "633.0000",
+                    "B/E No": "PQIB-FS-21256",
+                    "PER UNIT VALUE": "0.115"
+                },
+                {
+                    "NOW CONSUMED": "3.2072",
+                    "B/E No": "KAPS-FS-19777",
+                    "PER UNIT VALUE": "15.828"
+                },
+                {
+                    "NOW CONSUMED": "0.0253",
+                    "B/E No": "KPPE-PF-209549",
+                    "PER UNIT VALUE": "47.176"
+                },
+                {
+                    "NOW CONSUMED": "3.7980",
+                    "B/E No": "07052024-A-094990",
+                    "PER UNIT VALUE": "0.930"
+                },
+                {
+                    "NOW CONSUMED": "31.6500",
+                    "B/E No": "11062024-A-113214",
+                    "PER UNIT VALUE": "1.421"
+                }
+            ]
+        },
+        "6104.3900": {
+            "main_details": {
+                "HS CODE": "6104.3900",
+                "DESCRIPTION": "WOMENS 80%-20% JACKETS",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-879-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6110.2000": {
+            "main_details": {
+                "HS CODE": "6110.2000",
+                "DESCRIPTION": "M/W 100% PULLOVER",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-880-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6110.9000": {
+            "main_details": {
+                "HS CODE": "6110.9000",
+                "DESCRIPTION": "M/W 80%-20% PULLOVER",
+                "PIECES": "1706",
+                "NET NET WEIGHT": "490.91",
+                "ANALYSIS NUMBER": "LEXP-0657810-881-22-01-2024"
+            },
+            "sub_table": [
+                {
+                    "NOW CONSUMED": "39.9204",
+                    "B/E No": "KAPS-FS-31095",
+                    "PER UNIT VALUE": "3.950"
+                },
+                {
+                    "NOW CONSUMED": "9.2124",
+                    "B/E No": "LPAF-FS-41827",
+                    "PER UNIT VALUE": "25.583"
+                },
+                {
+                    "NOW CONSUMED": "46.0620",
+                    "B/E No": "KAPW-FS-164203",
+                    "PER UNIT VALUE": "0.460"
+                },
+                {
+                    "NOW CONSUMED": "2559.0000",
+                    "B/E No": "PQIB-FS-21256",
+                    "PER UNIT VALUE": "0.115"
+                },
+                {
+                    "NOW CONSUMED": "12.9656",
+                    "B/E No": "KAPS-FS-19777",
+                    "PER UNIT VALUE": "15.828"
+                },
+                {
+                    "NOW CONSUMED": "0.1024",
+                    "B/E No": "KPPE-PF-209549",
+                    "PER UNIT VALUE": "47.176"
+                },
+                {
+                    "NOW CONSUMED": "15.3540",
+                    "B/E No": "07052024-A-094990",
+                    "PER UNIT VALUE": "0.930"
+                },
+                {
+                    "NOW CONSUMED": "127.9500",
+                    "B/E No": "11062024-A-113214",
+                    "PER UNIT VALUE": "1.421"
+                }
+            ]
+        },
+        "6103.2200": {
+            "main_details": {
+                "HS CODE": "6103.2200",
+                "DESCRIPTION": "MENS 100% SUIT",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-882-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6103.2900": {
+            "main_details": {
+                "HS CODE": "6103.2900",
+                "DESCRIPTION": "MENS 80%-20 SUIT",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-883-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.2200": {
+            "main_details": {
+                "HS CODE": "6104.2200",
+                "DESCRIPTION": "WOMENS 100% SUIT",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-884-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.2900": {
+            "main_details": {
+                "HS CODE": "6104.2900",
+                "DESCRIPTION": "WOMENS 80%-20 SUIT",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-885-22-01-2024"
+            },
+            "sub_table": []
+        },
+        "6105.1000": {
+            "main_details": {
+                "HS CODE": "6105.1000",
+                "DESCRIPTION": "100% SHIRT OR CROCHETED",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-887-23-01-2024"
+            },
+            "sub_table": []
+        },
+        "6105.9000": {
+            "main_details": {
+                "HS CODE": "6105.9000",
+                "DESCRIPTION": "80% 20% SHIRT OR CROCHETED",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-886-23-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.5200": {
+            "main_details": {
+                "HS CODE": "6104.5200",
+                "DESCRIPTION": "100% SKIRTS",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-888-23-01-2024"
+            },
+            "sub_table": []
+        },
+        "6104.5900": {
+            "main_details": {
+                "HS CODE": "6104.5900",
+                "DESCRIPTION": "80%-20% SKIRTS",
+                "PIECES": "0",
+                "NET NET WEIGHT": "0.00",
+                "ANALYSIS NUMBER": "LEXP-0657810-889-23-01-2024"
+            },
+            "sub_table": []
+        }
+    }
+}
