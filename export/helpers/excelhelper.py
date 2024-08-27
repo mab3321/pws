@@ -66,8 +66,8 @@ def extract_main_details(table):
     dict: The dictionary containing the main details.
     """
     main_details = {k: v for k, v in table.iloc[0].to_dict().items() if pd.notna(v)}
-    last_key = list(main_details.keys())[-1]
-    main_details["ANALYSIS NUMBER"] = main_details.pop(last_key)
+    # last_key = list(main_details.keys())[-1]
+    # main_details["ANALYSIS NUMBER"] = main_details.pop(last_key)
     return main_details
 
 def extract_sub_table(table, sub_table_start_text):
@@ -124,7 +124,7 @@ def filter_sub_table(data):
     sub_table_df = sub_table_df[sub_table_df['NOW CONSUMED'].notna() & ~sub_table_df['NOW CONSUMED'].apply(is_zero)]
 
     # Specify the required columns
-    required_columns = ["NOW CONSUMED", "B/E No", "PER UNIT VALUE"]
+    required_columns = ["DESCRIPTION OF GOODS","NOW CONSUMED", "B/E No", "PER UNIT VALUE"]
 
     # Ensure the columns are standardized and strip any extra spaces
     sub_table_df.columns = sub_table_df.columns.str.strip()
@@ -146,43 +146,60 @@ class CSVDataExtractor:
         self.file_path = file_path
         self.table1_data = self.extract_table_1()
         self.table492_data = self.extract_table_492()
-        self.table957_data = self.extract_table_957()
+        self.table957_data:list[dict] = self.extract_table_957()
         
         self.hs_code_wise_tables = self.extract_hs_code_wise_tables()
 
-    def get_analysis_number(self,hs_code):
+    def get_analysis_number(self,hs_code,data):
         for entry in self.table1_data:
             if entry['HS CODE:'] == hs_code:
-                return entry['ANALYSIS NO:']
+                description_of_goods = data.get('DESCRIPTION OF GOODS')
+                if any(yarn_type in description_of_goods for yarn_type in ["100% COTTON YARN", "POLYESTER YARN"]):
+                    return entry.get('ANALYSIS FABRIC/ YARN')
+                else:
+                    return entry['ANALYSIS PIECE WISE']
         return None
     def extract_table_1(self):
-        # Load the CSV file
         data = pd.read_csv(self.file_path, header=None)
-        
-        # Find the row where HS CODE starts
-        hs_code_row_index = data[data.iloc[:, 0] == 'HS CODE:'].index[0]
-        
-        # Extract column headers from the row where HS CODE is found
-        column_headers = data.iloc[hs_code_row_index, 1:].tolist()
+    
+        # Find all the row indices where 'HS CODE:' starts
+        hs_code_row_indices = data[data.iloc[:, 0] == 'HS CODE:'].index.tolist()
         
         # Rows of interest
-        rows_of_interest = ['HS CODE:', 'DESCRIPTION:', 'CTN PCS', 'POLSTER PCS', 'WHITE', 'TOTAL PCS', 'N N WEIGHT:', 'ANALYSIS NO:']
+        rows_of_interest = ['HS CODE:', 'DESCRIPTION:', 'COTTON PIECES', 'POLSTER PIECES', 'WHITE PIECES', 
+                            'TOTAL PIECES', 'NET NET WEIGHT:', 'PER PIECE WEIGHT (G)', 'ANALYSIS PIECE WISE', 
+                            'ANALYSIS FABRIC/ YARN']
         
-        # Extract the rows data
-        rows_data = {}
-        for row_name in rows_of_interest:
-            row_index = data[data.iloc[:, 0] == row_name].index[0]
-            rows_data[row_name] = data.iloc[row_index, 1:].tolist()
+        # List to hold all formatted data
+        all_formatted_data = []
         
-        # Create a list to hold the formatted data
-        formatted_data = []
-        for col_index in range(len(column_headers)):
-            col_data = {row: rows_data[row][col_index] for row in rows_of_interest}
-            # Only include entries where 'HS CODE:' is not NaN
-            if pd.notna(col_data['HS CODE:']):
-                formatted_data.append(col_data)
+        # Iterate over each section indicated by 'HS CODE:'
+        for hs_code_row_index in hs_code_row_indices:
+            # Extract column headers from the row where HS CODE is found
+            column_headers = data.iloc[hs_code_row_index, 1:].tolist()
+            
+            # Extract the rows data for the current section
+            rows_data = {}
+            for row_name in rows_of_interest:
+                row_index = data[data.iloc[:, 0] == row_name].index[hs_code_row_indices.index(hs_code_row_index)]
+                rows_data[row_name] = data.iloc[row_index, 1:].tolist()
+            
+            # Format and append the data for this section
+            formatted_data = []
+            for col_index in range(len(column_headers)):
+                col_data = {row: rows_data[row][col_index] for row in rows_of_interest}
+                # Fix: If 'ANALYSIS FABRIC/ YARN' is NaN, use the value from 'ANALYSIS PIECE WISE'
+                if pd.isna(col_data['ANALYSIS FABRIC/ YARN']):
+                    col_data['ANALYSIS FABRIC/ YARN'] = col_data['ANALYSIS PIECE WISE']
+                # Check if HS CODE is valid (only digits and not NaN) and not equal to 0
+                hs_code_valid = pd.notna(col_data['HS CODE:']) and str(col_data['HS CODE:']).replace('.', '').isdigit()
+                hs_code_not_zero = col_data['HS CODE:'] != 0
+                if hs_code_valid and hs_code_not_zero:
+                    formatted_data.append(col_data)
+            
+            all_formatted_data.extend(formatted_data)
         
-        return formatted_data
+        return all_formatted_data
 
     def extract_table_492(self):
         df_full = pd.read_csv(self.file_path)
@@ -245,12 +262,10 @@ class CSVDataExtractor:
             data.columns = headers
             
             # Extract the relevant columns
-            required_columns = ['B/E No/PACKAGE NO/PURCHASE INV#', 'PER UNIT VALUE', 'NOW CONSUMED']
+            required_columns = ['DESCRIPTION OF GOODS', 'B/E No/PACKAGE NO/PURCHASE INV#', 'PER UNIT VALUE', 'NOW CONSUMED']
             data = data[required_columns]
-            
             # Filter out rows where 'NOW CONSUMED' is NaN or 0
             data = data[data['NOW CONSUMED'].notna() & (data['NOW CONSUMED'] != 0)]
-            
             # Convert the DataFrame to a list of dictionaries
             data_dict = data.to_dict(orient='records')
             
@@ -274,7 +289,7 @@ class CSVDataExtractor:
         df_full = read_csv_data(self.file_path)
 
         # Define the header keywords
-        header_keywords = ["HS CODE", "DESCRIPTION", "PIECES", "NET NET WEIGHT"]
+        header_keywords = ["HS CODE", "DESCRIPTION", "PIECES", "NET NET WEIGHT","PER PIECE WEIGHT (Grams)"]
         start_text = "HS CODE WISE CONSUMPTION"
         sub_table_start_text = "CONSUMPTION OF RAW MATERIAL  IMPORTED UNDER SRO 957 (I) 2021 DATED. 30-JULY-2021(EFS-EXPORT FACILTAION SCHEME)"
 
@@ -292,7 +307,7 @@ class CSVDataExtractor:
             raise Exception("Header row not found in the file")
 
         tables = {}
-        
+
         for i in range(len(header_indices)):
             start_index = header_indices[i]
             end_index = header_indices[i + 1] if i + 1 < len(header_indices) else len(data)

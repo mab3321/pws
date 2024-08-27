@@ -17,6 +17,7 @@ from datetime import datetime
 from selenium.webdriver.chrome.service import Service as ChromeService
 from chromedriver_py import binary_path
 
+summaries = []
 
 def setup_driver():
     svc = webdriver.ChromeService(executable_path=binary_path)
@@ -659,8 +660,9 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
             EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
         )
 
-def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscode_wise=False):
+def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code_of_item=None):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
+    hs_code = None
     if is_hscode_wise:
         be_no = 'B/E No'
     toggle_NonDutyPaid(driver)
@@ -670,6 +672,7 @@ def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscod
     try:
         hs_code = process_gd_number_pop_up_957(driver, data, is_hscode_wise)
         if hs_code:
+            analysis_number = csv_obj.get_analysis_number(hs_code_of_item,data)
             res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
             if res_process_analysis_number_pop_up_957:
                 click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
@@ -687,6 +690,14 @@ def add_excel_data_957(driver: webdriver.Chrome, data, analysis_number, is_hscod
         else:
             raise Exception(f"HS Code Not Found for {data.get(be_no)}")
     except Exception as e:
+        error_message = str(e).replace('\n', ' ')
+        truncated_error = ' '.join(error_message.split()[:100])
+        local_summary = {
+            'B/E No': data.get(be_no),
+            'HS Code': hs_code,
+            'Error': truncated_error
+        }
+        summaries.append(local_summary)
         print(f"Got Error for {data.get(be_no)} => {str(e)}")
         # Cancel the present filling
         click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnCancelBottom")
@@ -701,16 +712,17 @@ def process_492(driver, data):
             add_excel_data_492(driver, data=obj)
 
 
-def process_957(driver, data, analysis_number, is_hscode_wise=False):
+def process_957(driver, data, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code=None):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
         be_no = 'B/E No'
-    for obj in data:
-        if categorize_invoice(obj.get(be_no)) == 'non_local':
-            add_excel_data_957(driver, data=obj, analysis_number=analysis_number, is_hscode_wise=is_hscode_wise)
+    for indvidual_957_data in data:
+        
+        if categorize_invoice(indvidual_957_data.get(be_no)) == 'non_local':
+            add_excel_data_957(driver, data=indvidual_957_data, is_hscode_wise=is_hscode_wise,csv_obj=csv_obj,hs_code_of_item=hs_code)
         else:
-            print(f"Local Invoice {obj.get(be_no)}")
-            add_excel_data_local(driver, data=obj, analysis_number=analysis_number, is_hscode_wise=is_hscode_wise)
+            print(f"Local Invoice {indvidual_957_data.get(be_no)}")
+            add_excel_data_local(driver, data=indvidual_957_data, is_hscode_wise=is_hscode_wise,csv_obj=csv_obj,hs_code_of_item=hs_code)
 
 
 def process_localy_purchased_analysis_no_pop_up_957(driver: webdriver.Chrome, analysis_number, hs_code):
@@ -850,7 +862,7 @@ def process_localy_purchased_pop_up_957(driver: webdriver.Chrome, data, is_hscod
     return hs_code
 
 
-def add_excel_data_local(driver: webdriver.Chrome, data, analysis_number, is_hscode_wise=False):
+def add_excel_data_local(driver: webdriver.Chrome, data, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code_of_item=None):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
         be_no = 'B/E No'
@@ -863,6 +875,7 @@ def add_excel_data_local(driver: webdriver.Chrome, data, analysis_number, is_hsc
 
     hs_code = process_localy_purchased_pop_up_957(driver, data, is_hscode_wise)
     if hs_code:
+        analysis_number = csv_obj.get_analysis_number(hs_code=hs_code_of_item,data=data)
         res_957 = process_localy_purchased_analysis_no_pop_up_957(driver, analysis_number=analysis_number,
                                                                   hs_code=hs_code)
         if res_957:
@@ -890,8 +903,7 @@ def Non_Duty_Paid_Info(driver, csv_obj: CSVDataExtractor, hs_code, elem_index):
     data_957 = csv_obj.table957_data
 
     process_492(driver, data_492)
-    analysis_number = csv_obj.get_analysis_number(hs_code)
-    process_957(driver, data_957, analysis_number)
+    process_957(driver, data_957, csv_obj=csv_obj,hs_code=hs_code)
     time.sleep(5)
     click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnSaveBottom")
     WebDriverWait(driver, 100).until(
@@ -906,8 +918,7 @@ def Non_Duty_Paid_Info_multi_po(driver, csv_obj: CSVDataExtractor, hs_code, elem
     data_957_hs_code_wise = csv_obj.hs_code_wise_tables.get(hs_code)
     data_957 = data_957_hs_code_wise.get('sub_table')
 
-    analysis_number = csv_obj.get_analysis_number(hs_code)
-    process_957(driver, data_957, analysis_number, is_hscode_wise=True)
+    process_957(driver, data_957, is_hscode_wise=True,csv_obj=csv_obj,hs_code=hs_code)
     time.sleep(5)
     click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnSaveBottom")
     WebDriverWait(driver, 100).until(
@@ -917,6 +928,9 @@ def Non_Duty_Paid_Info_multi_po(driver, csv_obj: CSVDataExtractor, hs_code, elem
 
 def process_multi_single(driver, items_data, prev_idx=0):
     for idx, item_data in enumerate(items_data):
+        if not item_data.get('hs_code'):
+            print(f"HS Code not found for item {item_data}")
+            continue
         item_no=True if idx == 0 else None
         hs_code = add_item(driver, 1, data=item_data, item_no=item_no)
         Non_Duty_Paid_Info(driver, item_data.get('csv_obj'), hs_code, elem_index=idx + 1 + prev_idx)
@@ -1011,7 +1025,6 @@ def main(data):
                     process_multi_single(driver,items_data,prev_idx)
         else:
             finalMessage = login_form_error
-
     except Exception as e:
         print(f"For transaction_id { transaction_id } Exception occurred: {e}")
         finalStatus = False
@@ -1019,7 +1032,8 @@ def main(data):
     finally:
         return driver
 pl_pdf_path, fty_pdf_path, csv_path = extract_files_club_single()
-pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = extract_files_club_po()
+# pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = extract_files_club_po()
+pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = None,None,None,None
 
 fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
 pl_parser = PlParse(pl_po_pdf_path)
