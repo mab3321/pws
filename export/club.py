@@ -573,7 +573,50 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=F
     hs_code = extract_text(driver, "ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_txtHsCode")
     return hs_code
 
-def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code):
+def select_table_row_pop_up_957(driver : webdriver.Chrome,per_unit_weight):
+    table = WebDriverWait(driver, 100).until(
+            EC.presence_of_element_located((By.ID, "dgLookupExport"))
+        )
+
+    # Find all rows in the table body
+    rows = table.find_elements(By.TAG_NAME, "tr")
+
+    # Iterate through the rows, skipping the header
+    for row in rows[1:]:
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if cells:
+            print("The cell's text is : ",cells[4].text)
+            try:
+                item_description = cells[4].text
+                
+                if per_unit_weight in item_description:
+                    select_link = cells[0].find_element(By.TAG_NAME, "a")
+                    if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+                        select_link.click()
+                    else:
+                        return None
+                    time.sleep(2)
+                    break
+            except ValueError:
+                print(f"Skipping row due to non-numeric value: {cells[4].text}")
+    else:
+        print('In rows')
+        # select 1st row
+        row = rows[1]
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if cells:
+            select_link = cells[0].find_element(By.TAG_NAME, "a")
+            print(f"No matching row found in the table for PER UNIT Weight {per_unit_weight} Selecting 1st row")
+            if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+                select_link.click()
+                time.sleep(5)
+            else:
+                print("Select Link is not enabled")
+                return None
+        else:
+            return None
+
+def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code,hs_code_description=None,per_unit_weight=None):
             # Store the ID of the original window
     original_window = driver.current_window_handle
 
@@ -595,6 +638,8 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
     # For example, finding an element and interacting with it
     write_text(driver, "txtSearch",analysis_number,pop_up=True)
     write_text(driver, "txtInputHSCode",hs_code,pop_up=True)
+    if hs_code_description:
+        write_text(driver, "txtInputHSCodeDescription",hs_code_description,pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(3)
     table = WebDriverWait(driver, 100).until(
@@ -611,8 +656,10 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
         except NoSuchWindowException:
             print("The new window was already closed.")
         return None
-    click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
-        # Attempt to close the new window
+    if per_unit_weight:
+        select_table_row_pop_up_957(driver,per_unit_weight)
+    else:
+        click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
     try:
         driver.close()
     except NoSuchWindowException:
@@ -673,7 +720,12 @@ def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False
         hs_code = process_gd_number_pop_up_957(driver, data, is_hscode_wise)
         if hs_code:
             analysis_number = csv_obj.get_analysis_number(hs_code_of_item,data)
-            res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
+            description_of_goods = data.get('DESCRIPTION OF GOODS')
+            if any(yarn_type in description_of_goods for yarn_type in ["100% COTTON YARN", "POLYESTER YARN"]):
+                res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
+            else:
+                res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
+
             if res_process_analysis_number_pop_up_957:
                 click_button(driver=driver, id="//input[@id='ctl00_ContentPlaceHolder2_btnSaveBottom']", by=By.XPATH)
                 table = WebDriverWait(driver, 100).until(
