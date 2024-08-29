@@ -124,10 +124,14 @@ def filter_sub_table(data):
     sub_table_df = sub_table_df[sub_table_df['NOW CONSUMED'].notna() & ~sub_table_df['NOW CONSUMED'].apply(is_zero)]
 
     # Specify the required columns
-    required_columns = ["DESCRIPTION OF GOODS","NOW CONSUMED", "B/E No", "PER UNIT VALUE"]
+    required_columns = ["DESCRIPTION OF GOODS", "NOW CONSUMED", "B/E No", "PER UNIT VALUE", "IOCO Ratio"]
 
     # Ensure the columns are standardized and strip any extra spaces
     sub_table_df.columns = sub_table_df.columns.str.strip()
+
+    # Add the "IOCO Ratio" column with None values if it does not exist
+    if "IOCO Ratio" not in sub_table_df.columns:
+        sub_table_df["IOCO Ratio"] = None
 
     # Select only the specified columns
     sub_table_df = sub_table_df[required_columns]

@@ -574,50 +574,69 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=F
     return hs_code
 
 def select_table_row_pop_up_957(driver : webdriver.Chrome,per_unit_weight):
-    table = WebDriverWait(driver, 100).until(
-            EC.presence_of_element_located((By.ID, "dgLookupExport"))
-        )
+    try:
+        table = WebDriverWait(driver, 100).until(
+                EC.presence_of_element_located((By.ID, "dgLookupExport"))
+            )
 
-    # Find all rows in the table body
-    rows = table.find_elements(By.TAG_NAME, "tr")
 
-    # Iterate through the rows, skipping the header
-    for row in rows[1:]:
-        cells = row.find_elements(By.TAG_NAME, "td")
-        if cells:
-            print("The cell's text is : ",cells[4].text)
-            try:
+        # Find all rows in the table body
+        rows = table.find_elements(By.TAG_NAME, "tr")
+        extracted_integers = []
+
+        # extract all integers from the item description
+        for row in rows[1:]:
+            cells = row.find_elements(By.TAG_NAME, "td")
+            if cells:
                 item_description = cells[4].text
-                
-                if per_unit_weight in item_description:
-                    select_link = cells[0].find_element(By.TAG_NAME, "a")
-                    if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
-                        select_link.click()
-                    else:
-                        return None
-                    time.sleep(2)
-                    break
-            except ValueError:
-                print(f"Skipping row due to non-numeric value: {cells[4].text}")
-    else:
-        print('In rows')
-        # select 1st row
-        row = rows[1]
-        cells = row.find_elements(By.TAG_NAME, "td")
-        if cells:
-            select_link = cells[0].find_element(By.TAG_NAME, "a")
-            print(f"No matching row found in the table for PER UNIT Weight {per_unit_weight} Selecting 1st row")
-            if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
-                select_link.click()
-                time.sleep(5)
-            else:
-                print("Select Link is not enabled")
-                return None
-        else:
-            return None
 
-def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code,hs_code_description=None,per_unit_weight=None):
+                # Extract the first integer from the item description
+                puw = extract_first_integer_from_text(item_description)
+                if puw:
+                    extracted_integers.append(puw)
+        print(f"Extracted Integers: {extracted_integers}")
+        # Iterate through the rows, skipping the header
+        for row in rows[1:]:
+            cells = row.find_elements(By.TAG_NAME, "td")
+            if cells:
+                print("The cell's text is : ",cells[4].text)
+                try:
+                    item_description = cells[4].text
+                    available_puw = find_closest_floor(extracted_integers, int(per_unit_weight))
+                    print(f"Available PUW: {available_puw}")
+                    if available_puw:
+                        select_link = cells[0].find_element(By.TAG_NAME, "a")
+                        if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+                            select_link.click()
+                        else:
+                            return None
+                        time.sleep(2)
+                        break
+                except ValueError:
+                    print(f"Skipping row due to non-numeric value: {cells[4].text}")
+        else:
+            print('In rows')
+            # select 1st row
+            row = rows[1]
+            cells = row.find_elements(By.TAG_NAME, "td")
+            if cells:
+                select_link = cells[0].find_element(By.TAG_NAME, "a")
+                print(f"No matching row found in the table for PER UNIT Weight {per_unit_weight} Selecting 1st row")
+                if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+                    select_link.click()
+                    time.sleep(5)
+                else:
+                    print("Select Link is not enabled")
+                    return None
+            else:
+                return None
+    except Exception as e:
+        print(f"Exception Occured: {str(e)}")
+        return None
+
+def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number,hs_code,hs_code_description=None,per_unit_weight:float=None):
             # Store the ID of the original window
+    error = None
     original_window = driver.current_window_handle
 
     click_button(driver=driver,id="ctl00_ContentPlaceHolder2_NonDutyPaidItemDetailUc1_btnAnalysisLookup")
@@ -655,11 +674,17 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
             driver.switch_to.frame(iframe)
         except NoSuchWindowException:
             print("The new window was already closed.")
+        if hs_code_description:
+            return 'Data not Found for HS Code Description'
         return None
-    if per_unit_weight:
-        select_table_row_pop_up_957(driver,per_unit_weight)
-    else:
-        click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+    try:
+        if per_unit_weight:
+            select_table_row_pop_up_957(driver,per_unit_weight)
+        else:
+            click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookupExport_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
+    except:
+        print("Error in selecting the row")
+        error = "Error in selecting the row"
     try:
         driver.close()
     except NoSuchWindowException:
@@ -673,6 +698,8 @@ def process_analysis_number_pop_up_957(driver : webdriver.Chrome,analysis_number
     driver.switch_to.frame(iframe)
     time.sleep(2)
     wait_for_page_load(driver)
+    if error:
+        return False
     return True
 
 def add_excel_data_492(driver: webdriver.Chrome, data):
@@ -707,7 +734,7 @@ def add_excel_data_492(driver: webdriver.Chrome, data):
             EC.presence_of_element_located((By.ID, "ctl00_ContentPlaceHolder2_ItemsInfoDetailUc1_pnlTitle"))
         )
 
-def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code_of_item=None):
+def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code_of_item=None,per_unit_weight=None):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     hs_code = None
     if is_hscode_wise:
@@ -722,7 +749,15 @@ def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False
             analysis_number = csv_obj.get_analysis_number(hs_code_of_item,data)
             description_of_goods = data.get('DESCRIPTION OF GOODS')
             if any(yarn_type in description_of_goods for yarn_type in ["100% COTTON YARN", "POLYESTER YARN"]):
-                res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
+                ioco_ratio = data.get('IOCO Ratio')
+                if ioco_ratio:
+                    hs_code_description = formatIocoRatio(ioco_ratio)
+                    res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight,hs_code_description=hs_code_description)
+                    if "Data not Found for HS Code Description" in res_process_analysis_number_pop_up_957:
+                        res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight)
+                else:
+                    res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight)
+                    
             else:
                 res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code)
 
@@ -764,14 +799,14 @@ def process_492(driver, data):
             add_excel_data_492(driver, data=obj)
 
 
-def process_957(driver, data, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code=None):
+def process_957(driver, data, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code=None,per_unit_weight=None):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
         be_no = 'B/E No'
     for indvidual_957_data in data:
         
         if categorize_invoice(indvidual_957_data.get(be_no)) == 'non_local':
-            add_excel_data_957(driver, data=indvidual_957_data, is_hscode_wise=is_hscode_wise,csv_obj=csv_obj,hs_code_of_item=hs_code)
+            add_excel_data_957(driver, data=indvidual_957_data, is_hscode_wise=is_hscode_wise,csv_obj=csv_obj,hs_code_of_item=hs_code,per_unit_weight=per_unit_weight)
         else:
             print(f"Local Invoice {indvidual_957_data.get(be_no)}")
             add_excel_data_local(driver, data=indvidual_957_data, is_hscode_wise=is_hscode_wise,csv_obj=csv_obj,hs_code_of_item=hs_code)
@@ -968,9 +1003,12 @@ def Non_Duty_Paid_Info_multi_po(driver, csv_obj: CSVDataExtractor, hs_code, elem
     toggle_NonDutyPaid(driver)
 
     data_957_hs_code_wise = csv_obj.hs_code_wise_tables.get(hs_code)
+    ppw = data_957_hs_code_wise.get('main_details').get('PER PIECE WEIGHT (Grams)')
+    if ppw and (ppw != '#DIV/0!' and ppw != '0'):
+        per_unit_weight = float(ppw)
     data_957 = data_957_hs_code_wise.get('sub_table')
 
-    process_957(driver, data_957, is_hscode_wise=True,csv_obj=csv_obj,hs_code=hs_code)
+    process_957(driver, data_957, is_hscode_wise=True,csv_obj=csv_obj,hs_code=hs_code,per_unit_weight=per_unit_weight)
     time.sleep(5)
     click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnSaveBottom")
     WebDriverWait(driver, 100).until(
@@ -1105,8 +1143,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     pl_pdf_path, fty_pdf_path, csv_path = extract_files_club_single()
-    # pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = extract_files_club_po()
-    pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = None, None, None, None
+    pl_po_pdf_path, fty_po_pdf_path, csv_po_path,desc_po_path = extract_files_club_po()
     if fty_pdf_path:
         fty_parser = MultiSingleParse(fty_pdf_path,csv_path=csv_path)
         pl_parser = PlParse(pl_pdf_path)

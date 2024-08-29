@@ -19,6 +19,47 @@ from .constants import *
 # Function to wait for the page to load completely
 import os
 import shutil
+def formatIocoRatio(value):
+    """
+    Returns the first non-zero digit in the given number, regardless of its position and apends 00.
+
+    Parameters:
+    value (float or str): The value to analyze.
+
+    Returns:
+    str: The first non-zero digit as a string, or None if no non-zero digit is found.
+    """
+    # Convert the value to string to handle both integers and floats
+    value_str = str(float(value)).replace('.', '').replace('-', '')  # Remove decimal point and negative sign if present
+
+    # Loop through the string to find the first non-zero digit
+    for digit in value_str:
+        if digit != '0':
+            return str(digit+'00')
+
+    # If no non-zero digit is found (unlikely in valid numbers), return None
+    return '100'
+
+# Function to extract the first integer from a string
+def extract_first_integer_from_text(cell_text: str):
+    # Use regular expression to find the first integer in the string
+    match = re.search(r'\((?:\D*\d+)\)', cell_text)
+    
+    if match:
+        return int(re.search(r'\d+', match.group()).group())
+    return None
+
+# Function to find the closest floor integer in a list compared to a given number
+def find_closest_floor(numbers, target):
+    # Filter numbers that are less than or equal to the target
+    floor_numbers = [num for num in numbers if num <= target]
+    
+    # If no valid floor number is found, return None
+    if not floor_numbers:
+        return None
+    
+    # Return the maximum of the floor numbers (closest floor)
+    return max(floor_numbers)
 
 # Function to determine material category
 def determine_category(description):
@@ -33,13 +74,18 @@ def determine_category(description):
 
 def csv_path_of_invoice(directory, invoice_number):
     print(f"Searching for CSV file for invoice number {invoice_number} in {directory}...")
-    for root, _, files in os.walk(directory):
-        for file in files:
-            print(file)
-            if file.endswith('.csv') and str(invoice_number) in file:
-                file_path = os.path.join(root, file)
-                return file_path
-    raise FileNotFoundError(f"No CSV file found for invoice number {invoice_number}.")
+    try:
+        for root, _, files in os.walk(directory):
+            for file in files:
+                print(file)
+                if file.endswith('.csv') and str(invoice_number) in file:
+                    file_path = os.path.join(root, file)
+                    return file_path
+    except FileNotFoundError:
+        print(f"Directory For {invoice_number} not found.")
+        return "File Not Found"
+    except Exception as e:
+        raise e
 def extract_text_after_number(text):
     pattern = re.compile(r'\d{5,}\s+(.*)')
     match = pattern.search(text)
