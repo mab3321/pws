@@ -81,8 +81,13 @@ def csv_path_of_invoice(directory, invoice_number):
                 if file.endswith('.csv') and str(invoice_number) in file:
                     file_path = os.path.join(root, file)
                     return file_path
+        
+        # If no matching file is found, return "File Not Found"
+        print(f"No CSV file found for invoice number {invoice_number}.")
+        return "File Not Found"
+
     except FileNotFoundError:
-        print(f"Directory For {invoice_number} not found.")
+        print(f"Directory {directory} not found.")
         return "File Not Found"
     except Exception as e:
         raise e

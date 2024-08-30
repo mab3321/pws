@@ -109,22 +109,27 @@ class MultiSingleParse:
         combined_totals =[]
         # Extract relevant totals from the last two pages and combine them into a single dictionary
         for page in self.pdf.pages:
+            
             invoice_number,log_no,document_date,invoice_date = self.data_from_top_box(page)
-            notes = self.extract_notes_from_page(page)
-            hs_code = find_hs_code(notes)
-            totals_dict = extract_totals_from_text(page)
-            totals_dict['hs_code'] = hs_code
-            totals_dict['notes'] = notes
-            totals_dict['description'] = extract_text_after_number(notes)
-            totals_dict['invoice_number'] = invoice_number[-6:]
             csv_path = csv_path_of_invoice(self.csv_path, invoice_number[-6:])
-            totals_dict['csv_obj'] = CSVDataExtractor(csv_path)
-            totals_dict['log_no'] = log_no
-            totals_dict['document_date'] = document_date
-            totals_dict['invoice_date'] = invoice_date
-            if not self.date:
-                self.date = invoice_date
-            combined_totals.append(totals_dict)  # Update the combined dictionary with the current page's dictionary
+            print(f"CSV Path is {csv_path}")
+            if (csv_path == "File Not Found"):
+                continue
+            else:
+                notes = self.extract_notes_from_page(page)
+                hs_code = find_hs_code(notes)
+                totals_dict = extract_totals_from_text(page)
+                totals_dict['hs_code'] = hs_code
+                totals_dict['notes'] = notes
+                totals_dict['description'] = extract_text_after_number(notes)
+                totals_dict['invoice_number'] = invoice_number[-6:]
+                totals_dict['csv_obj'] = CSVDataExtractor(csv_path)
+                totals_dict['log_no'] = log_no
+                totals_dict['document_date'] = document_date
+                totals_dict['invoice_date'] = invoice_date
+                if not self.date:
+                    self.date = invoice_date
+                combined_totals.append(totals_dict)  # Update the combined dictionary with the current page's dictionary
         self.extracted_data['extracted_data'] = combined_totals
         # Print the combined dictionary with data from the last two pages
         return True
@@ -169,11 +174,17 @@ class MultiPOParse:
     def extract_details(self):
         final_table_list = []
         extracted_data = self.extract_po_numbers_per_invoice(self.pdf_path)
+        invoices_to_remove = []
         for invoice_number in extracted_data.keys():
             csv_path = csv_path_of_invoice(self.csv_path, invoice_number[-6:])
-            extracted_data[invoice_number]['csv_obj'] = CSVDataExtractor(csv_path)
-            final_table_list.append(extracted_data[invoice_number]['totals'])
-        
+            if csv_path == "File Not Found":
+                invoices_to_remove.append(invoice_number)
+            else:
+                extracted_data[invoice_number]['csv_obj'] = CSVDataExtractor(csv_path)
+                final_table_list.append(extracted_data[invoice_number]['totals'])
+        # Remove invoices with "Not found" csv_path
+        for invoice_number in invoices_to_remove:
+            del extracted_data[invoice_number]
         self.po_data = self.load_and_prepare_data()
         self.extracted_data['po_tables'] = extracted_data
         self.extracted_data['final_table'] = self.summarize_data(final_table_list)
