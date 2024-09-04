@@ -6,7 +6,7 @@
             "DESCRIPTION:": "M/W 80%-20% T-SHIRTS",
             "CTN PCS": "401",
             "POLSTER PCS": "401",
-            "WHITE": NaN,
+            "WHITE": null,
             "TOTAL PCS": "401",
             "N N WEIGHT:": "115.3903708",
             "ANALYSIS NO:": "LEXP-0657810-870-19-01-2024"
@@ -15,7 +15,7 @@
             "HS CODE:": "6109.1000",
             "DESCRIPTION:": "M/W 100% T-SHIRTS",
             "CTN PCS": "2672",
-            "POLSTER PCS": NaN,
+            "POLSTER PCS": null,
             "WHITE": "774",
             "TOTAL PCS": "3446",
             "N N WEIGHT:": "991.6090221",
@@ -25,8 +25,8 @@
             "HS CODE:": "6103.4200",
             "DESCRIPTION:": "MEN PANT 100%",
             "CTN PCS": "32",
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "32",
             "N N WEIGHT:": "9.208209143",
             "ANALYSIS NO:": "LEXP-0657810-872-22-01-2024"
@@ -34,9 +34,9 @@
         {
             "HS CODE:": "6103.4900",
             "DESCRIPTION:": "MEN 80%-20% PANT",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-873-22-01-2024"
@@ -44,9 +44,9 @@
         {
             "HS CODE:": "6104.6200",
             "DESCRIPTION:": "WOMEN 100% PANTS",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-874-22-01-2024"
@@ -56,7 +56,7 @@
             "DESCRIPTION:": "WOMENS 80%-20% PANTS",
             "CTN PCS": "840",
             "POLSTER PCS": "840",
-            "WHITE": NaN,
+            "WHITE": null,
             "TOTAL PCS": "840",
             "N N WEIGHT:": "241.71549",
             "ANALYSIS NO:": "LEXP-0657810-875-22-01-2024"
@@ -64,9 +64,9 @@
         {
             "HS CODE:": "6103.3200",
             "DESCRIPTION:": "MENS 100% JACKETS",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-876-22-01-2024"
@@ -74,9 +74,9 @@
         {
             "HS CODE:": "6103.3900",
             "DESCRIPTION:": "MENS 80%-20 JACKETS",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-877-22-01-2024"
@@ -85,8 +85,8 @@
             "HS CODE:": "6104.3200",
             "DESCRIPTION:": "WOMENS 100% JACKETS",
             "CTN PCS": "422",
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "422",
             "N N WEIGHT:": "121.4332581",
             "ANALYSIS NO:": "LEXP-0657810-878-22-01-2024"
@@ -94,9 +94,9 @@
         {
             "HS CODE:": "6104.3900",
             "DESCRIPTION:": "WOMENS 80%-20% JACKETS",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-879-22-01-2024"
@@ -104,9 +104,9 @@
         {
             "HS CODE:": "6110.2000",
             "DESCRIPTION:": "M/W 100% PULLOVER",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-880-22-01-2024"
@@ -116,7 +116,7 @@
             "DESCRIPTION:": "M/W 80%-20% PULLOVER",
             "CTN PCS": "1706",
             "POLSTER PCS": "1706",
-            "WHITE": NaN,
+            "WHITE": null,
             "TOTAL PCS": "1706",
             "N N WEIGHT:": "490.9126499",
             "ANALYSIS NO:": "LEXP-0657810-881-22-01-2024"
@@ -124,9 +124,9 @@
         {
             "HS CODE:": "6103.2200",
             "DESCRIPTION:": "MENS 100% SUIT",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-882-22-01-2024"
@@ -134,9 +134,9 @@
         {
             "HS CODE:": "6103.2900",
             "DESCRIPTION:": "MENS 80%-20 SUIT",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-883-22-01-2024"
@@ -144,9 +144,9 @@
         {
             "HS CODE:": "6104.2200",
             "DESCRIPTION:": "WOMENS 100% SUIT",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-884-22-01-2024"
@@ -154,9 +154,9 @@
         {
             "HS CODE:": "6104.2900",
             "DESCRIPTION:": "WOMENS 80%-20% SUIT",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-885-22-01-2024"
@@ -164,9 +164,9 @@
         {
             "HS CODE:": "6105.1000",
             "DESCRIPTION:": "100% SHIRT OR CROCHETED",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-887-23-01-2024"
@@ -174,9 +174,9 @@
         {
             "HS CODE:": "6105.9000",
             "DESCRIPTION:": "80% 20% SHIRT OR CROCHETED",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-886-23-01-2024"
@@ -184,9 +184,9 @@
         {
             "HS CODE:": "6104.5200",
             "DESCRIPTION:": "100% SKIRTS",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-888-23-01-2024"
@@ -194,9 +194,9 @@
         {
             "HS CODE:": "6104.5900",
             "DESCRIPTION:": "80%-20% SKIRTS",
-            "CTN PCS": NaN,
-            "POLSTER PCS": NaN,
-            "WHITE": NaN,
+            "CTN PCS": null,
+            "POLSTER PCS": null,
+            "WHITE": null,
             "TOTAL PCS": "0",
             "N N WEIGHT:": "0",
             "ANALYSIS NO:": "LEXP-0657810-889-23-01-2024"

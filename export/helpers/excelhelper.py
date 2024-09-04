@@ -154,14 +154,25 @@ class CSVDataExtractor:
         
         self.hs_code_wise_tables = self.extract_hs_code_wise_tables()
 
-    def get_analysis_number(self,hs_code,data):
+    def get_analysis_number(self,hs_code,data,csv_obj=None):
+        
         for entry in self.table1_data:
             if entry['HS CODE:'] == hs_code:
-                description_of_goods = data.get('DESCRIPTION OF GOODS')
-                if any(yarn_type in description_of_goods for yarn_type in ["100% COTTON YARN", "POLYESTER YARN"]):
-                    return entry.get('ANALYSIS FABRIC/ YARN')
+                description_of_goods = data.get('DESCRIPTION OF GOODS','').lower()
+                if csv_obj:
+                    hs_code_table = csv_obj.hs_code_wise_tables.get(str(hs_code))
+                    main_details = hs_code_table.get('main_details')
+                    
+                    if any(yarn_type in description_of_goods for yarn_type in [r"cotton yarn", "polyester yarn"]):
+                        return main_details.get('ANALYSIS FABRIC & YARN')
+                    else:
+                        return main_details.get('ANALYSIS DYES & CHEMICAL')
+                    
                 else:
-                    return entry['ANALYSIS PIECE WISE']
+                    if any(yarn_type in description_of_goods for yarn_type in [r"cotton yarn", "polyester yarn"]):
+                        return entry.get('ANALYSIS FABRIC/ YARN')
+                    else:
+                        return entry['ANALYSIS PIECE WISE']
         return None
     def extract_table_1(self):
         data = pd.read_csv(self.file_path, header=None)
@@ -266,10 +277,15 @@ class CSVDataExtractor:
             data.columns = headers
             
             # Extract the relevant columns
-            required_columns = ['DESCRIPTION OF GOODS', 'B/E No/PACKAGE NO/PURCHASE INV#', 'PER UNIT VALUE', 'NOW CONSUMED']
+            required_columns = ['DESCRIPTION OF GOODS', 'IOCO Ratio','B/E No/PACKAGE NO/PURCHASE INV#', 'PER UNIT VALUE', 'NOW CONSUMED']
             data = data[required_columns]
+            
+            # Convert NaN values in 'IOCO Ratio' to None
+            data['IOCO Ratio'] = data['IOCO Ratio'].apply(lambda x: None if pd.isna(x) else x)
+            
             # Filter out rows where 'NOW CONSUMED' is NaN or 0
             data = data[data['NOW CONSUMED'].notna() & (data['NOW CONSUMED'] != 0)]
+            
             # Convert the DataFrame to a list of dictionaries
             data_dict = data.to_dict(orient='records')
             
@@ -277,7 +293,7 @@ class CSVDataExtractor:
         else:
             print("Headers not found in the file")
             raise Exception("Table 957 not found in the file")
-    
+
     def extract_hs_code_wise_tables(self):
         
         """

@@ -606,7 +606,7 @@ def select_table_row_pop_up_957(driver : webdriver.Chrome,per_unit_weight):
                     print(f"Available PUW: {available_puw}")
                     if available_puw:
                         select_link = cells[0].find_element(By.TAG_NAME, "a")
-                        if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+                        if select_link:
                             select_link.click()
                         else:
                             return None
@@ -746,10 +746,13 @@ def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False
     try:
         hs_code = process_gd_number_pop_up_957(driver, data, is_hscode_wise)
         if hs_code:
-            analysis_number = csv_obj.get_analysis_number(hs_code_of_item,data)
-            description_of_goods = data.get('DESCRIPTION OF GOODS')
-            if any(yarn_type in description_of_goods for yarn_type in ["100% COTTON YARN", "POLYESTER YARN"]):
+            analysis_number = csv_obj.get_analysis_number(hs_code_of_item,data,csv_obj)
+            if not analysis_number:
+                raise Exception(f"Analysis Number Not Found for {data.get(be_no)}")
+            description_of_goods = data.get('DESCRIPTION OF GOODS','').lower()
+            if any(yarn_type in description_of_goods for yarn_type in [r"cotton yarn", "polyester yarn"]):
                 ioco_ratio = data.get('IOCO Ratio')
+                print(f"IOCO RATIO IS {ioco_ratio}")
                 if ioco_ratio:
                     hs_code_description = formatIocoRatio(ioco_ratio)
                     res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight,hs_code_description=hs_code_description)
@@ -781,7 +784,7 @@ def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False
         truncated_error = ' '.join(error_message.split()[:100])
         local_summary = {
             'B/E No': data.get(be_no),
-            'HS Code': hs_code,
+            'HS Code': hs_code_of_item,
             'Error': truncated_error
         }
         summaries.append(local_summary)
@@ -799,7 +802,7 @@ def process_492(driver, data):
             add_excel_data_492(driver, data=obj)
 
 
-def process_957(driver, data, is_hscode_wise=False,csv_obj : CSVDataExtractor=None,hs_code=None,per_unit_weight=None):
+def process_957(driver, data, is_hscode_wise=True,csv_obj : CSVDataExtractor=None,hs_code=None,per_unit_weight=None):
     be_no = 'B/E No/PACKAGE NO/PURCHASE INV#'
     if is_hscode_wise:
         be_no = 'B/E No'
@@ -985,12 +988,20 @@ def add_excel_data_local(driver: webdriver.Chrome, data, is_hscode_wise=False,cs
 def Non_Duty_Paid_Info(driver, csv_obj: CSVDataExtractor, hs_code, elem_index):
     select_added_item(driver)
     # Wait until the image is present
-
+    data_957_hs_code_wise = csv_obj.hs_code_wise_tables.get(str(hs_code))
+    ppw = data_957_hs_code_wise.get('main_details').get('PER PIECE WEIGHT (Grams)')
+    ioco_value = data_957_hs_code_wise.get('main_details').get('IOCO Value')
+    if ppw and (ppw != '#DIV/0!' and ppw != '0'):
+        per_unit_weight = float(ppw)
+    else:
+        per_unit_weight = None
+    data_957 = data_957_hs_code_wise.get('sub_table')
     data_492 = csv_obj.table492_data
-    data_957 = csv_obj.table957_data
-
+    print(f"data_957 Hs Code wise is  {data_957}")
+    print(f"data_957 is {csv_obj.table957_data}")
     process_492(driver, data_492)
-    process_957(driver, data_957, csv_obj=csv_obj,hs_code=hs_code)
+    
+    process_957(driver, data_957, csv_obj=csv_obj,hs_code=hs_code,per_unit_weight=per_unit_weight,is_hscode_wise=True)
     time.sleep(5)
     click_button(driver=driver, id="ctl00_ContentPlaceHolder2_btnSaveBottom")
     WebDriverWait(driver, 100).until(
@@ -1103,7 +1114,6 @@ def main(data):
                 time.sleep(5)
                 fty_data = data.get('fty_data')
                 po_obj = data.get('po_obj')
-                
                 prev_idx = 0
                 print(f"Starting the Multi PO Process")
                 if po_obj:

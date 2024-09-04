@@ -150,6 +150,7 @@ def find_hs_code(description):
 
     return None
 def categorize_invoice(invoice):
+    invoice = invoice.strip()
     if invoice[0].isalpha():
         return 'non_local'
     elif invoice[0].isdigit():
