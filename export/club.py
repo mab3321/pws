@@ -491,10 +491,18 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=F
     write_text(driver, "txtSearch",data.get(be_no),pop_up=True)
     click_button(driver, "btnSearch",pop_up=True)
     time.sleep(5)
+    table_2_text = ''
     table = WebDriverWait(driver, 100).until(
         EC.presence_of_element_located((By.ID, "tblAlert"))
     )
-    if 'no data found' in table.text.lower():
+    try:
+        table = WebDriverWait(driver, 5).until(
+            EC.presence_of_element_located((By.ID, "pnlMessage"))
+        )
+        table_2_text = table.text.lower().strip()
+    except :
+        pass
+    if ('no data found' in table.text.lower()) or ('no data found' in table_2_text):
         try:
             driver.close()
             driver.switch_to.window(original_window)
@@ -505,6 +513,7 @@ def process_gd_number_pop_up_957(driver : webdriver.Chrome,data,is_hscode_wise=F
         except NoSuchWindowException:
             print("The new window was already closed.")
         return None
+    
     click_button(driver, id="//tr[@class='ItemStyle']//a[@id='dgLookup_ctl02_lbSelect']",by=By.XPATH,pop_up=True)
         # Attempt to close the new window
     try:
@@ -607,7 +616,9 @@ def select_table_row_pop_up_957(driver : webdriver.Chrome,per_unit_weight):
                     if available_puw:
                         select_link = cells[0].find_element(By.TAG_NAME, "a")
                         if select_link:
+                            print(f"Clicking on the select with text {select_link.text}")
                             select_link.click()
+                            print(f"Clicked on the select with text {select_link.text}")
                         else:
                             return None
                         time.sleep(2)
@@ -622,8 +633,10 @@ def select_table_row_pop_up_957(driver : webdriver.Chrome,per_unit_weight):
             if cells:
                 select_link = cells[0].find_element(By.TAG_NAME, "a")
                 print(f"No matching row found in the table for PER UNIT Weight {per_unit_weight} Selecting 1st row")
-                if select_link.is_enabled() and select_link.get_attribute("disabled") is None:
+                if select_link:
+                    print(f"Clicking on the select with text {select_link.text}")
                     select_link.click()
+                    print(f"Clicked on the select with text {select_link.text}")
                     time.sleep(5)
                 else:
                     print("Select Link is not enabled")
@@ -756,8 +769,9 @@ def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False
                 if ioco_ratio:
                     hs_code_description = formatIocoRatio(ioco_ratio)
                     res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight,hs_code_description=hs_code_description)
-                    if "Data not Found for HS Code Description" in res_process_analysis_number_pop_up_957:
-                        res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight)
+                    
+                    if isinstance(res_process_analysis_number_pop_up_957, str) and "Data not Found for HS Code Description" in res_process_analysis_number_pop_up_957:
+                        res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code, per_unit_weight=per_unit_weight)
                 else:
                     res_process_analysis_number_pop_up_957 = process_analysis_number_pop_up_957(driver, analysis_number=analysis_number, hs_code=hs_code,per_unit_weight=per_unit_weight)
                     
@@ -1074,8 +1088,8 @@ def process_multi_po(driver, po_obj: MultiPOParse):
             if hs_code not in processed_hs_codes:
                 if idx == 0:
                     Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
-                    print(f"Adding HS Code Wise Tables for hs code {hs_code}")
-                Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                else:
+                    Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
                 print(f"GD Completed For Item: {item_data}")
                 processed_hs_codes.add(hs_code)
             else:
