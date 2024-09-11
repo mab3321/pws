@@ -144,7 +144,25 @@ def filter_sub_table(data):
         'main_details': main_details,
         'sub_table': filtered_sub_table
     }
-
+    
+def sanitize_hs_code(hs_code):
+    # Convert the hs_code to a string for manipulation
+    hs_code_str = str(hs_code)
+    
+    # Split the hs_code into the integer and decimal parts
+    if '.' in hs_code_str:
+        integer_part, decimal_part = hs_code_str.split('.')
+    else:
+        integer_part = hs_code_str
+        decimal_part = ''
+    
+    # Ensure the decimal part has exactly four digits
+    decimal_part = decimal_part.ljust(4, '0')[:4]
+    
+    # Combine the integer part with the sanitized decimal part
+    sanitized_hs_code = f"{integer_part}.{decimal_part}"
+    
+    return sanitized_hs_code
 class CSVDataExtractor:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -204,6 +222,9 @@ class CSVDataExtractor:
             for col_index in range(len(column_headers)):
                 col_data = {row: rows_data[row][col_index] for row in rows_of_interest}
                 # Fix: If 'ANALYSIS FABRIC/ YARN' is NaN, use the value from 'ANALYSIS PIECE WISE'
+                # Sanitize HS Code
+                if pd.notna(col_data['HS CODE:']):
+                    col_data['HS CODE:'] = sanitize_hs_code(col_data['HS CODE:'])
                 if pd.isna(col_data['ANALYSIS FABRIC/ YARN']):
                     col_data['ANALYSIS FABRIC/ YARN'] = col_data['ANALYSIS PIECE WISE']
                 # Check if HS CODE is valid (only digits and not NaN) and not equal to 0
@@ -350,7 +371,7 @@ class CSVDataExtractor:
             sub_table_dict = sub_table.to_dict(orient='records') if not sub_table.empty else []
 
             # Format the final table dictionary
-            hs_code = main_details['HS CODE']
+            hs_code = sanitize_hs_code(main_details['HS CODE'])
             final_table_dict = {
                 "main_details": main_details,
                 "sub_table": sub_table_dict
