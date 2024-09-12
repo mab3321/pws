@@ -1026,7 +1026,7 @@ def Non_Duty_Paid_Info(driver, csv_obj: CSVDataExtractor, hs_code, elem_index):
 def Non_Duty_Paid_Info_multi_po(driver, csv_obj: CSVDataExtractor, hs_code, elem_index):
     select_added_item(driver)
     toggle_NonDutyPaid(driver)
-
+    per_unit_weight = None
     data_957_hs_code_wise = csv_obj.hs_code_wise_tables.get(hs_code)
     ppw = data_957_hs_code_wise.get('main_details').get('PER PIECE WEIGHT (Grams)')
     if ppw and (ppw != '#DIV/0!' and ppw != '0'):
