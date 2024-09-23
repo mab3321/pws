@@ -179,7 +179,7 @@ def fill_form(driver: webdriver.Chrome, transaction_id, data={}):
         # Consignor & Consignee Information (Hide)
         write_text(driver, "ctl00_ContentPlaceHolder2_ConsigneeInfoUc1_txtConsignorName", pl_data.get("consignee"))
         write_text(driver, "ctl00_ContentPlaceHolder2_ConsigneeInfoUc1_txtConsignorAddress", pl_data.get("address"))
-
+        select_dropdown_by_value(driver, "ctl00_ContentPlaceHolder2_ConsigneeInfoUc1_ddlConsigneeName", "4")
         # GD Information
         select_dropdown(driver=driver, id="ctl00_ContentPlaceHolder2_GdInfoSeaUc_ddlConsignmentMode",
                         option_text="Part Shipment")
@@ -785,8 +785,8 @@ def add_excel_data_957(driver: webdriver.Chrome, data:dict, is_hscode_wise=False
                     )
                 error_text = table.text.lower().strip()
                 if error_text:
-                    print(f"Got Error for {data.get(be_no)}")
-                    raise Exception(f"Got Error for {data.get(be_no)}")
+                    print(f"Got Error for {data.get(be_no)} => {error_text}")
+                    raise Exception(f"Got Error for {data.get(be_no)} => {error_text}")
                 print(f"Element in pop up Processed.")
             else:
                 raise Exception(f"Analysis Number Not Found for {data.get(be_no)}")
