@@ -1,28 +1,29 @@
 @echo off
-:: This script downloads the latest ChromeDriver, extracts it, and sets it up for use.
+:: This script sets up a Python virtual environment and installs dependencies
+:: Ensure the script starts in the current directory (the directory where this batch file is located)
+cd /d %~dp0
 
-:: Retrieve the latest ChromeDriver version
-for /f "delims=" %%i in ('powershell -NoLogo -NoProfile -Command "(Invoke-WebRequest -Uri 'https://chromedriver.storage.googleapis.com/LATEST_RELEASE').Content"') do set CHROME_DRIVER_VERSION=%%i
+:: Change to the 'export' directory within the current directory
+echo Changing directory to 'export'
+cd export || (
+    echo Failed to change directory to 'export'
+    pause
+    exit /b 1
+)
 
-:: Download the corresponding ChromeDriver zip file
-echo Downloading ChromeDriver version %CHROME_DRIVER_VERSION%
-powershell -NoLogo -NoProfile -Command "Invoke-WebRequest -Uri 'https://chromedriver.storage.googleapis.com/%CHROME_DRIVER_VERSION%/chromedriver_win32.zip' -OutFile 'chromedriver_win32.zip'"
+:: Activate the virtual environment
+echo Activating virtual environment
+call .venv\Scripts\activate
+:: Change to the desired directory
+cd /d "export"
 
-:: Extract the ChromeDriver executable
-echo Extracting ChromeDriver
-powershell -NoLogo -NoProfile -Command "Expand-Archive -Path 'chromedriver_win32.zip' -DestinationPath '.'"
+:: Uninstall the existing chromedriver_py package
+echo Uninstalling chromedriver_py...
+pip uninstall -y chromedriver_py
 
-:: Clean up the downloaded zip file
-echo Cleaning up
-del chromedriver_win32.zip
-
-:: Move ChromeDriver to a directory in the PATH
-echo Moving ChromeDriver to C:\Windows\System32
-move /y chromedriver.exe C:\Windows\System32\chromedriver.exe
-
-:: Set permissions
-echo Setting permissions
-icacls C:\Windows\System32\chromedriver.exe /grant Users:F /T
+:: Reinstall the chromedriver_py package
+echo Installing chromedriver_py...
+pip install chromedriver_py
 
 echo ChromeDriver setup complete
 pause

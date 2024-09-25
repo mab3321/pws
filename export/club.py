@@ -16,7 +16,7 @@ import os
 from datetime import datetime
 from selenium.webdriver.chrome.service import Service as ChromeService
 from chromedriver_py import binary_path
-
+from webdriver_manager.chrome import ChromeDriverManager
 summaries = []
 
 def setup_driver():
@@ -27,7 +27,7 @@ def setup_driver():
     # chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-software-rasterizer')
     driver = webdriver.Chrome(options=chrome_options, service=svc)
-
+    # driver = webdriver.Chrome(ChromeDriverManager().install(), options=chrome_options)
     return driver
 
 
