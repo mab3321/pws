@@ -176,14 +176,13 @@ class MultiPOParse:
         invoices_to_remove = []
         for invoice_number in extracted_data.keys():
             csv_path = csv_path_of_invoice(self.csv_path, invoice_number[-6:])
-            if csv_path == "File Not Found":
-                invoices_to_remove.append(invoice_number)
-            else:
-                extracted_data[invoice_number]['csv_obj'] = CSVDataExtractor(csv_path)
-                final_table_list.append(extracted_data[invoice_number]['totals'])
-        # Remove invoices with "Not found" csv_path
-        for invoice_number in invoices_to_remove:
-            del extracted_data[invoice_number]
+            csv_obj = CSVDataExtractor(csv_path) if csv_path != "File Not Found" else None
+            extracted_data[invoice_number]['csv_obj'] = csv_obj
+            final_table_list.append(extracted_data[invoice_number]['totals'])
+        
+        # # Remove invoices with "Not found" csv_path
+        # for invoice_number in invoices_to_remove:
+        #     del extracted_data[invoice_number]
         self.po_data = self.load_and_prepare_data()
         self.extracted_data['po_tables'] = extracted_data
         self.extracted_data['final_table'] = self.summarize_data(final_table_list)

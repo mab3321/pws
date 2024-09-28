@@ -1085,16 +1085,18 @@ def process_multi_po(driver, po_obj: MultiPOParse):
                 add_item(driver, 1, data=data_to_send, item_no=True)
             else:
                 add_item(driver, 1, data=data_to_send)
-
-            if hs_code not in processed_hs_codes:
-                if idx == 0:
-                    Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+            if data_to_send.get('csv_obj'):
+                if hs_code not in processed_hs_codes:
+                    if idx == 0:
+                        Non_Duty_Paid_Info(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                    else:
+                        Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
+                    print(f"GD Completed For Item: {item_data}")
+                    processed_hs_codes.add(hs_code)
                 else:
-                    Non_Duty_Paid_Info_multi_po(driver, data_to_send.get('csv_obj'), hs_code=hs_code, elem_index=idx + 1)
-                print(f"GD Completed For Item: {item_data}")
-                processed_hs_codes.add(hs_code)
+                    print(f"HS code {hs_code} is duplicate, skipping Non_Duty_Paid_Info.")
             else:
-                print(f"HS code {hs_code} is duplicate, skipping Non_Duty_Paid_Info.")
+                print(f"CSV Object not found for item {item_data} So skipping the Non_Duty_Paid_Info")
 
     return idx
 

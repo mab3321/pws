@@ -219,10 +219,10 @@ def extract_files_club_single(single_path=None):
             # Assign the renamed file to the appropriate variable
             if 'fty' in new_filename.lower() and new_filename.endswith('.pdf'):
                 fty_pdf_path = new_filepath
+                csv_path = os.path.dirname(os.path.abspath(new_filepath))
             elif 'pl' in new_filename.lower() and new_filename.endswith('.pdf'):
                 pl_pdf_path = new_filepath
-            elif new_filename.endswith('.csv'):
-                csv_path = os.path.dirname(os.path.abspath(new_filepath))
+            
 
     # Check if the required files were found and assigned
     if pl_pdf_path and fty_pdf_path and csv_path:
@@ -288,10 +288,9 @@ def extract_files_club_po(po_path=None):
             # Assign the renamed file to the appropriate variable
             if 'fty' in new_filename.lower() and new_filename.endswith('.pdf'):
                 fty_pdf_path = new_filepath
+                csv_path = os.path.dirname(os.path.abspath(new_filepath))
             elif 'pl' in new_filename.lower() and new_filename.endswith('.pdf'):
                 pl_pdf_path = new_filepath
-            elif new_filename.endswith('.csv'):
-                csv_path = os.path.dirname(os.path.abspath(new_filepath))
             elif new_filename.endswith('.xlsx'):
                 desc_path = new_filepath
 
