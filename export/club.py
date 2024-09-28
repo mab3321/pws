@@ -1048,8 +1048,9 @@ def process_multi_single(driver, items_data, prev_idx=0):
             continue
         item_no=True if idx == 0 else None
         hs_code = add_item(driver, 1, data=item_data, item_no=item_no)
-        Non_Duty_Paid_Info(driver, item_data.get('csv_obj'), hs_code, elem_index=idx + 1 + prev_idx)
-        print(f"GD Completed For Item : {item_data}")
+        if item_data.get('csv_obj'):
+            Non_Duty_Paid_Info(driver, item_data.get('csv_obj'), hs_code, elem_index=idx + 1 + prev_idx)
+            print(f"GD Completed For Item : {item_data}")
     return idx
 
 
@@ -1158,7 +1159,7 @@ if __name__ == "__main__":
     parser.add_argument('--user_id', type=int, default=123, help='Transaction ID')
     parser.add_argument('--URL', type=str, default='https://app.psw.gov.pk/app/', help='URL')
     parser.add_argument('--UserName', type=str, default='CA-01-2688539', help='Username')
-    parser.add_argument('--Password', type=str, default='Express@5599', help='Password')
+    parser.add_argument('--Password', type=str, default='Karachi@5599', help='Password')
     parser.add_argument('--player_username', type=str, default='hassanlahore', help='Player username')
     parser.add_argument('--player_nickname', type=str, default='hassanlahore', help='Player nickname')
     parser.add_argument('--player_password', type=str, default='12345', help='Player password')

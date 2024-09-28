@@ -113,23 +113,22 @@ class MultiSingleParse:
             invoice_number,log_no,document_date,invoice_date = self.data_from_top_box(page)
             csv_path = csv_path_of_invoice(self.csv_path, invoice_number[-6:])
             print(f"CSV Path is {csv_path}")
-            if (csv_path == "File Not Found"):
-                continue
-            else:
-                notes = self.extract_notes_from_page(page)
-                hs_code = find_hs_code(notes)
-                totals_dict = extract_totals_from_text(page)
-                totals_dict['hs_code'] = hs_code
-                totals_dict['notes'] = notes
-                totals_dict['description'] = extract_text_after_number(notes)
-                totals_dict['invoice_number'] = invoice_number[-6:]
-                totals_dict['csv_obj'] = CSVDataExtractor(csv_path)
-                totals_dict['log_no'] = log_no
-                totals_dict['document_date'] = document_date
-                totals_dict['invoice_date'] = invoice_date
-                if not self.date:
-                    self.date = invoice_date
-                combined_totals.append(totals_dict)  # Update the combined dictionary with the current page's dictionary
+            
+            notes = self.extract_notes_from_page(page)
+            hs_code = find_hs_code(notes)
+            totals_dict = extract_totals_from_text(page)
+            totals_dict['hs_code'] = hs_code
+            totals_dict['notes'] = notes
+            totals_dict['description'] = extract_text_after_number(notes)
+            totals_dict['invoice_number'] = invoice_number[-6:]
+            csv_obj = CSVDataExtractor(csv_path) if csv_path != "File Not Found" else None
+            totals_dict['csv_obj'] = csv_obj
+            totals_dict['log_no'] = log_no
+            totals_dict['document_date'] = document_date
+            totals_dict['invoice_date'] = invoice_date
+            if not self.date:
+                self.date = invoice_date
+            combined_totals.append(totals_dict)  # Update the combined dictionary with the current page's dictionary
         self.extracted_data['extracted_data'] = combined_totals
         # Print the combined dictionary with data from the last two pages
         return True
